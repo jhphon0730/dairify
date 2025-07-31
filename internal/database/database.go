@@ -12,13 +12,17 @@ import (
 	"github.com/jhphon0730/dairify/internal/config"
 )
 
+type DB struct {
+	*sql.DB
+}
+
 var (
-	db   *sql.DB
+	db   *DB
 	once sync.Once
 )
 
 // NewDB 함수는 데이터베이스 연결을 생성하고 스키마를 적용하는 함수
-func NewDB() (*sql.DB, error) {
+func NewDB() (*DB, error) {
 	cfg := config.GetConfig()
 
 	connStr := "host=" + cfg.Postgres.DB_HOST +
@@ -41,11 +45,11 @@ func NewDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	return db, nil
+	return &DB{db}, nil
 }
 
 // GetDB 함수는 db 인스턴스를 반환하는 함수
-func GetDB() *sql.DB {
+func GetDB() *DB {
 	once.Do(func() {
 		var err error
 		db, err = NewDB()
