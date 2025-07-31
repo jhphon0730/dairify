@@ -2,9 +2,10 @@ package database
 
 import (
 	"database/sql"
-	"io/ioutil"
 	"log"
+	"os"
 	"strings"
+	"sync"
 
 	_ "github.com/lib/pq"
 
@@ -12,7 +13,8 @@ import (
 )
 
 var (
-	db *sql.DB
+	db   *sql.DB
+	once sync.Once
 )
 
 // NewDB 함수는 데이터베이스 연결을 생성하고 스키마를 적용하는 함수
@@ -44,16 +46,20 @@ func NewDB() (*sql.DB, error) {
 
 // GetDB 함수는 db 인스턴스를 반환하는 함수
 func GetDB() *sql.DB {
-	if db == nil {
-		log.Println("Database connection is not initialized")
-		NewDB()
-	}
+	once.Do(func() {
+		var err error
+		db, err = NewDB()
+		if err != nil {
+			log.Fatalln("Failed to connect to database:", err)
+		}
+	})
+
 	return db
 }
 
 // applySchema 함수는 데이터베이스에 스키마를 적용하는 함수
 func applySchema(db *sql.DB) error {
-	schema, err := ioutil.ReadFile("migrations/schema.sql")
+	schema, err := os.ReadFile("migrations/schema.sql")
 	if err != nil {
 		return err
 	}
