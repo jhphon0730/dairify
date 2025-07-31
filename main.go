@@ -36,8 +36,8 @@ func main() {
 	MOD := config.AppEnv
 
 	// HTTP 서버 설정
-	mux := server.NewServer(PORT)
-	mux.RegisterHealthCheck()
+	muxSrv := server.NewServer(PORT)
+	muxSrv.RegisterHealthCheck()
 
 	// OS 종료 신호 처리
 	c := make(chan os.Signal, 1)
@@ -46,7 +46,7 @@ func main() {
 	// 서버 실행
 	go func() {
 		log.Printf("Server running on port %s in %s mode", PORT, MOD)
-		if err := mux.RunServer(); err != nil {
+		if err := muxSrv.RunServer(); err != nil {
 			log.Printf("Server error: %v", err)
 		}
 	}()
@@ -56,6 +56,6 @@ func main() {
 	log.Println("Shutting down server...")
 
 	// 서버 종료
-	mux.Shutdown(ctx)
+	muxSrv.Shutdown(ctx)
 	log.Println("Server stopped")
 }
