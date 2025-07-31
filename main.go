@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,6 +11,7 @@ import (
 
 	"github.com/jhphon0730/dairify/internal/config"
 	"github.com/jhphon0730/dairify/internal/database"
+	"github.com/jhphon0730/dairify/internal/server"
 )
 
 func main() {
@@ -24,9 +25,9 @@ func main() {
 	}
 
 	// 데이터베이스 연결 및 스키마 적용
-	db, err := database.NewDB()
-	if err != nil || db == nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+	db := database.GetDB()
+	if db == nil {
+		log.Fatalf("Failed to initialize database: %v", errors.New("database connection is nil"))
 	}
 	defer database.Close() // 서버 종료 시 DB 연결 닫기
 
@@ -35,16 +36,8 @@ func main() {
 	MOD := config.AppEnv
 
 	// HTTP 서버 설정
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Server is healthy"))
-	})
-
-	server := &http.Server{
-		Addr:    ":" + PORT,
-		Handler: mux,
-	}
+	mux := server.NewServer(PORT)
+	mux.RegisterHealthCheck()
 
 	// OS 종료 신호 처리
 	c := make(chan os.Signal, 1)
@@ -53,8 +46,8 @@ func main() {
 	// 서버 실행
 	go func() {
 		log.Printf("Server running on port %s in %s mode", PORT, MOD)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server failed: %v", err)
+		if err := mux.RunServer(); err != nil {
+			log.Printf("Server error: %v", err)
 		}
 	}()
 
@@ -63,8 +56,6 @@ func main() {
 	log.Println("Shutting down server...")
 
 	// 서버 종료
-	if err := server.Shutdown(ctx); err != nil {
-		log.Printf("Server shutdown error: %v", err)
-	}
+	mux.Shutdown(ctx)
 	log.Println("Server stopped")
 }
