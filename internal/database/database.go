@@ -84,5 +84,6 @@ func applySchema(db *sql.DB) error {
 
 // Close 함수는 db 인스턴스를 닫아주는 함수
 func Close() error {
+	GetDB()
 	return db.Close()
 }
