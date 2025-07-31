@@ -14,6 +14,7 @@ type Server struct {
 // NewServer는 새로운 Server 인스턴스를 생성합니다.
 func NewServer(PORT string) *Server {
 	mux := http.NewServeMux()
+	SetupRoutes(mux)
 
 	return &Server{
 		httpServer: &http.Server{
@@ -24,14 +25,6 @@ func NewServer(PORT string) *Server {
 			IdleTimeout:  30 * time.Second,
 		},
 	}
-}
-
-// Register HealthCheck 핸들러를 등록합니다.
-func (s *Server) RegisterHealthCheck() {
-	s.httpServer.Handler.(*http.ServeMux).HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Server is healthy"))
-	})
 }
 
 // RunServer는 서버를 시작합니다.
