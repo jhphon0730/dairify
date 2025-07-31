@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"time"
+
+	"github.com/jhphon0730/dairify/internal/database"
 )
 
 // Server 인터페이스는 서버의 기본 동작을 정의합니다.
@@ -18,9 +20,9 @@ type server struct {
 }
 
 // NewServer는 새로운 Server 인스턴스를 생성합니다.
-func NewServer(PORT string) Server {
+func NewServer(PORT string, db *database.DB) Server {
 	mux := http.NewServeMux()
-	SetupRoutes(mux)
+	SetupRoutes(mux, db)
 
 	return &server{
 		httpServer: &http.Server{

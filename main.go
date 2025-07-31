@@ -36,7 +36,7 @@ func main() {
 	MOD := config.AppEnv
 
 	// HTTP 서버 설정
-	muxSrv := server.NewServer(PORT)
+	muxSrv := server.NewServer(PORT, db)
 
 	// OS 종료 신호 처리
 	c := make(chan os.Signal, 1)
