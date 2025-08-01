@@ -24,7 +24,7 @@ func NewUserRepository(db *database.DB) UserRepository {
 func (r *userRepository) CreateUser(userSignupDTO dto.UserSignupDTO) (int64, error) {
 	var id int64
 	query := `
-		INSERT INTO users (username, nickname, password_hash, email)
+		INSERT INTO users (username, nickname, password, email)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
