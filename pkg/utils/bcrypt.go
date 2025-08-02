@@ -5,6 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// GenerateHash 함수는 주어진 비밀번호를 해시화하여 반환합니다.
 func GenerateHash(password string) (string, error) {
 	cfg := config.GetConfig()
 

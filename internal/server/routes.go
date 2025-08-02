@@ -33,4 +33,6 @@ func RegisterHealthRoutes(mux *http.ServeMux) {
 
 // RegisterUserRoutes는 사용자 관련 라우트를 등록합니다.
 func RegisterUserRoutes(mux *http.ServeMux, userHandler handler.UserHandler) {
+	// 회원가입
+	mux.HandleFunc("/api/v1/users/signup", userHandler.SignupUser)
 }

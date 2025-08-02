@@ -53,5 +53,4 @@ func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 		"message": "User created successfully",
 		"data":    signupID,
 	})
-	return
 }
