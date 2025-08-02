@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jhphon0730/dairify/internal/dto"
+	"github.com/jhphon0730/dairify/internal/response"
 	"github.com/jhphon0730/dairify/internal/service"
 )
 
@@ -28,29 +29,27 @@ func NewUserHandler(userService service.UserService) UserHandler {
 // SignupUser 함수는 새로운 사용자를 등록하는 핸들러입니다.
 func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		response.Error(w, http.StatusMethodNotAllowed, "Method Not Allowed")
 		return
 	}
 
 	// body로 Input 받기
 	var inp dto.UserSignupDTO
 	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		response.Error(w, http.StatusBadRequest, "Bad Request: "+err.Error())
 		return
 	}
 
 	// Service 함수 호출
 	signupID, status, err := h.userService.SignupUser(r.Context(), inp)
 	if err != nil {
-		http.Error(w, err.Error(), status)
+		response.Error(w, status, "Error: "+err.Error())
 		return
 	}
 
-	// Return
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "User created successfully",
-		"data":    signupID,
-	})
+	res := dto.UserSignupResponseDTO{
+		SignupID: signupID,
+	}
+
+	response.Success(w, status, "User signed up successfully", res)
 }
