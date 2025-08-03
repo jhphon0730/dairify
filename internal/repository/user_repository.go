@@ -5,6 +5,8 @@ import (
 
 	"github.com/jhphon0730/dairify/internal/database"
 	"github.com/jhphon0730/dairify/internal/dto"
+	"github.com/jhphon0730/dairify/pkg/apperror"
+	"github.com/lib/pq"
 )
 
 // UserRepository 인터페이스는 사용자 관련 데이터베이스 작업을 정의합니다.
@@ -32,6 +34,16 @@ func (r *userRepository) CreateUser(ctx context.Context, userSignupDTO dto.UserS
 	`
 
 	if err := r.db.DB.QueryRowContext(ctx, query, userSignupDTO.Username, userSignupDTO.Nickname, userSignupDTO.Password, userSignupDTO.Email).Scan(&id); err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+			if pqErr.Constraint == "users_username_key" {
+				return 0, apperror.ErrUserSignupDuplicateUserName
+			}
+
+			if pqErr.Constraint == "users_email_key" {
+				return 0, apperror.ErrUserSignupDuplicateEmail
+			}
+		}
+
 		return 0, err
 	}
 

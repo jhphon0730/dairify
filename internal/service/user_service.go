@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/jhphon0730/dairify/internal/dto"
 	"github.com/jhphon0730/dairify/internal/repository"
+	"github.com/jhphon0730/dairify/pkg/apperror"
 	"github.com/jhphon0730/dairify/pkg/utils"
 )
 
@@ -29,19 +31,25 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 // Signup 함수는 새로운 사용자를 등록합니다.
 func (s *userService) SignupUser(ctx context.Context, userSignupDTO dto.UserSignupDTO) (int64, int, error) {
 	if err := userSignupDTO.CheckIsValidInput(); err != nil {
-		return -1, http.StatusBadRequest, err
+		return 0, http.StatusBadRequest, err
 	}
 
 	// 비밀번호 암호화를 위한 로직
 	hashedPassword, err := utils.GenerateHash(userSignupDTO.Password)
 	if err != nil {
-		return -1, http.StatusInternalServerError, err
+		return 0, http.StatusInternalServerError, err
 	}
 	userSignupDTO.Password = hashedPassword
 
 	signupID, err := s.userRepository.CreateUser(ctx, userSignupDTO)
 	if err != nil {
-		return -1, http.StatusInternalServerError, err
+		if errors.Is(err, apperror.ErrUserSignupDuplicateEmail) {
+			return 0, http.StatusConflict, err
+		}
+		if errors.Is(err, apperror.ErrUserSignupDuplicateUserName) {
+			return 0, http.StatusConflict, err
+		}
+		return 0, http.StatusInternalServerError, err
 	}
 
 	return signupID, http.StatusCreated, nil

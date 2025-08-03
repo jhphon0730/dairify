@@ -35,7 +35,7 @@ curl -X POST http://localhost:8080/api/v1/users/signup/ \
 */
 func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		response.Error(w, http.StatusMethodNotAllowed, apperror.Err_HTTP_METHOD_NOT_ALLOWED.Error())
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
 		return
 	}
 

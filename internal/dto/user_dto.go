@@ -17,19 +17,19 @@ type UserSignupDTO struct {
 // CheckIsValidInput 함수는 입력 값을 확인해주는 함수입니다.
 func (d *UserSignupDTO) CheckIsValidInput() error {
 	if strings.TrimSpace(d.Username) == "" {
-		return apperror.Err_USER_SIGNUP_USERNAME_REQUIRED
+		return apperror.ErrUserSignupUserNameRequired
 	}
 
 	if strings.TrimSpace(d.Nickname) == "" {
-		return apperror.Err_USER_SIGNUP_NICKNAME_REQUIRED
+		return apperror.ErrUserSignupNicknameRequired
 	}
 
 	if strings.TrimSpace(d.Password) == "" {
-		return apperror.Err_USER_SIGNUP_PASSWORD_REQUIRED
+		return apperror.ErrUserSignupPasswordRequired
 	}
 
 	if strings.TrimSpace(d.Email) == "" {
-		return apperror.Err_USER_SIGNUP_EMAIL_REQUIRED
+		return apperror.ErrUserSignupEmailRequired
 	}
 
 	return nil
