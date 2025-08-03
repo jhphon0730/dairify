@@ -25,7 +25,7 @@ func SetupRoutes(mux *http.ServeMux, db *database.DB) {
 
 // RegisterHealthRoutes는 헬스 체크 라우트를 등록합니다.
 func RegisterHealthRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/health/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Server is healthy"))
 	})
@@ -34,5 +34,5 @@ func RegisterHealthRoutes(mux *http.ServeMux) {
 // RegisterUserRoutes는 사용자 관련 라우트를 등록합니다.
 func RegisterUserRoutes(mux *http.ServeMux, userHandler handler.UserHandler) {
 	// 회원가입
-	mux.HandleFunc("/api/v1/users/signup", userHandler.SignupUser)
+	mux.HandleFunc("/api/v1/users/signup/", userHandler.SignupUser)
 }
