@@ -7,6 +7,7 @@ import (
 	"github.com/jhphon0730/dairify/internal/dto"
 	"github.com/jhphon0730/dairify/internal/response"
 	"github.com/jhphon0730/dairify/internal/service"
+	"github.com/jhphon0730/dairify/pkg/apperror"
 )
 
 // UserHandler 인터페이스는 사용자 관련 핸들러의 메서드를 정의합니다.
@@ -34,7 +35,7 @@ curl -X POST http://localhost:8080/api/v1/users/signup/ \
 */
 func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		response.Error(w, http.StatusMethodNotAllowed, "Method Not Allowed")
+		response.Error(w, http.StatusMethodNotAllowed, apperror.Err_HTTP_METHOD_NOT_ALLOWED.Error())
 		return
 	}
 
