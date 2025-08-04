@@ -3,6 +3,7 @@ package dto
 import (
 	"strings"
 
+	"github.com/jhphon0730/dairify/internal/model"
 	"github.com/jhphon0730/dairify/pkg/apperror"
 )
 
@@ -35,6 +36,33 @@ func (d *UserSignupDTO) CheckIsValidInput() error {
 	return nil
 }
 
+// UserSignupResponseDTO 구조체는 사용자 등록 응답을 위한 데이터 전송 객체입니다.
 type UserSignupResponseDTO struct {
 	SignupID int64 `json:"signup_id"`
+}
+
+// UserSigninDTO 구조체는 사용자 로그인을 위한 데이터 전송 객체입니다.
+type UserSigninDTO struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+// CheckIsValidInput 함수는 사용자 로그인 입력 값을 확인해주는 함수입니다.
+func (d *UserSigninDTO) CheckIsValidInput() error {
+	if strings.TrimSpace(d.Username) == "" {
+		return apperror.ErrUserSigninInvalidUserName
+	}
+
+	if strings.TrimSpace(d.Password) == "" {
+		return apperror.ErrUserSigninInvalidPassword
+	}
+
+	return nil
+}
+
+// UserSigninResponseDTO 구조체는 사용자 로그인 응답을 위한 데이터 전송 객체입니다.
+type UserSigninResponseDTO struct {
+	AccessToken  string      `json:"access_token"`
+	RefreshToken string      `json:"refresh_token"`
+	User         *model.User `json:"user"`
 }

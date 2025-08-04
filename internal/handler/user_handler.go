@@ -13,6 +13,7 @@ import (
 // UserHandler 인터페이스는 사용자 관련 핸들러의 메서드를 정의합니다.
 type UserHandler interface {
 	SignupUser(w http.ResponseWriter, r *http.Request)
+	SigninUser(w http.ResponseWriter, r *http.Request)
 }
 
 // userHandler 구조체는 UserHandler 인터페이스를 구현합니다.
@@ -58,4 +59,33 @@ func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, status, "User signed up successfully", res)
+}
+
+/*
+SigninUser 함수는 사용자를 로그인하는 핸들러입니다.
+curl -X POST http://localhost:8080/api/v1/users/signin/ \
+-H "Content-Type: application/json" \
+-d '{"username":"testuser","password":"password123"}'
+*/
+func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	// body로 Input 받기
+	var inp dto.UserSigninDTO
+	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
+		response.Error(w, http.StatusBadRequest, "Bad Request: "+err.Error())
+		return
+	}
+
+	// Service 함수 호출
+	signinResponse, status, err := h.userService.SigninUser(r.Context(), inp)
+	if err != nil {
+		response.Error(w, status, "Error: "+err.Error())
+		return
+	}
+
+	response.Success(w, status, "User signed in successfully", signinResponse)
 }
