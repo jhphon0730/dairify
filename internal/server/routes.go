@@ -5,6 +5,7 @@ import (
 
 	"github.com/jhphon0730/dairify/internal/database"
 	"github.com/jhphon0730/dairify/internal/handler"
+	"github.com/jhphon0730/dairify/internal/middleware"
 	"github.com/jhphon0730/dairify/internal/repository"
 	"github.com/jhphon0730/dairify/internal/service"
 )
@@ -33,6 +34,7 @@ func RegisterHealthRoutes(mux *http.ServeMux) {
 
 // RegisterUserRoutes는 사용자 관련 라우트를 등록합니다.
 func RegisterUserRoutes(mux *http.ServeMux, userHandler handler.UserHandler) {
-	mux.HandleFunc("/api/v1/users/signup/", userHandler.SignupUser) // 회원가입
-	mux.HandleFunc("/api/v1/users/signin/", userHandler.SigninUser) // 로그인
+	mux.HandleFunc("/api/v1/users/signup/", userHandler.SignupUser)                              // 회원가입
+	mux.HandleFunc("/api/v1/users/signin/", userHandler.SigninUser)                              // 로그인
+	mux.HandleFunc("/api/v1/users/profile/", middleware.AuthMiddleware(userHandler.ProfileUser)) // 프로필 조회
 }

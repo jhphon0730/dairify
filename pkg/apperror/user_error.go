@@ -7,7 +7,8 @@ var (
 	ErrJWTInvalidTokenSigningMethod = errors.New("올바르지 않은 토큰 서명 방법입니다")
 	ErrJWTInvalidRequest            = errors.New("올바르지 않은 요청입니다")
 
-	ErrUserNotFound = errors.New("사용자를 찾을 수 없습니다")
+	ErrUserNotFound     = errors.New("사용자를 찾을 수 없습니다")
+	ErrAuthUnauthorized = errors.New("인증되지 않은 요청입니다")
 
 	ErrUserSignupUserNameRequired = errors.New("ID는 필수 입력값입니다")
 	ErrUserSignupNicknameRequired = errors.New("닉네임은 필수 입력값입니다")

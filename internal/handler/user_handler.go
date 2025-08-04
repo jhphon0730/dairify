@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/jhphon0730/dairify/internal/dto"
+	"github.com/jhphon0730/dairify/internal/middleware"
 	"github.com/jhphon0730/dairify/internal/response"
 	"github.com/jhphon0730/dairify/internal/service"
 	"github.com/jhphon0730/dairify/pkg/apperror"
@@ -14,6 +15,7 @@ import (
 type UserHandler interface {
 	SignupUser(w http.ResponseWriter, r *http.Request)
 	SigninUser(w http.ResponseWriter, r *http.Request)
+	ProfileUser(w http.ResponseWriter, r *http.Request)
 }
 
 // userHandler 구조체는 UserHandler 인터페이스를 구현합니다.
@@ -88,4 +90,30 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, status, "User signed in successfully", signinResponse)
+}
+
+/*
+ProfileUser 함수는 사용자의 프로필 정보를 조회하는 핸들러입니다.
+curl -X GET http://localhost:8080/api/v1/users/profile/ \
+-H "Authorization: Bearer <token>"
+*/
+func (h *userHandler) ProfileUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
+		return
+	}
+
+	profileResponse, status, err := h.userService.Profile(r.Context(), userID)
+	if err != nil {
+		response.Error(w, status, "Error: "+err.Error())
+		return
+	}
+
+	response.Success(w, status, "User profile retrieved successfully", profileResponse)
 }

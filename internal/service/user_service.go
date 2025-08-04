@@ -16,6 +16,7 @@ import (
 type UserService interface {
 	SignupUser(ctx context.Context, userSignupDTO dto.UserSignupDTO) (int64, int, error)
 	SigninUser(ctx context.Context, userSigninDTO dto.UserSigninDTO) (*dto.UserSigninResponseDTO, int, error)
+	Profile(ctx context.Context, userID int64) (*dto.UserProfileResponseDTO, int, error)
 }
 
 // userService 구조체는 UserService 인터페이스를 구현합니다.
@@ -91,5 +92,17 @@ func (s *userService) SigninUser(ctx context.Context, userSigninDTO dto.UserSign
 		AccessToken:  acessToken,
 		RefreshToken: refreshToken,
 		User:         user,
+	}, http.StatusOK, nil
+}
+
+// Profile 함수는 사용자의 프로필 정보를 반환합니다.
+func (s *userService) Profile(ctx context.Context, userID int64) (*dto.UserProfileResponseDTO, int, error) {
+	user, err := s.userRepository.FindUserByUserID(ctx, userID)
+	if errors.Is(err, apperror.ErrUserNotFound) {
+		return nil, http.StatusNotFound, err
+	}
+
+	return &dto.UserProfileResponseDTO{
+		User: user,
 	}, http.StatusOK, nil
 }

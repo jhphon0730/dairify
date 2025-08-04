@@ -15,6 +15,7 @@ import (
 type UserRepository interface {
 	CreateUser(cxt context.Context, userSignupDTO dto.UserSignupDTO) (int64, error)
 	FindUserByUsername(ctx context.Context, username string) (*model.User, error)
+	FindUserByUserID(ctx context.Context, userID int64) (*model.User, error)
 }
 
 // userRepository 구조체는 UserRepository 인터페이스를 구현합니다.
@@ -64,6 +65,26 @@ func (r *userRepository) FindUserByUsername(ctx context.Context, username string
 
 	// 사용자 정보를 조회합니다.
 	if err := r.db.DB.QueryRowContext(ctx, query, username).Scan(&user.ID, &user.Username, &user.Nickname, &user.Password, &user.Email, &user.CreatedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// FindUserByUserID 함수는 사용자 ID로 사용자를 검색합니다.
+func (r *userRepository) FindUserByUserID(ctx context.Context, userID int64) (*model.User, error) {
+	user := &model.User{}
+	query := `
+		SELECT id, username, nickname, password, email, created_at
+		FROM users
+		WHERE id = $1
+	`
+
+	// 사용자 정보를 조회합니다.
+	if err := r.db.DB.QueryRowContext(ctx, query, userID).Scan(&user.ID, &user.Username, &user.Nickname, &user.Password, &user.Email, &user.CreatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, apperror.ErrUserNotFound
 		}

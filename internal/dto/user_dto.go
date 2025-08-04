@@ -66,3 +66,8 @@ type UserSigninResponseDTO struct {
 	RefreshToken string      `json:"refresh_token"`
 	User         *model.User `json:"user"`
 }
+
+// UserProfileResponseDTO 구조체는 사용자 프로필 응답을 위한 데이터 전송 객체입니다.
+type UserProfileResponseDTO struct {
+	User *model.User `json:"user"`
+}
