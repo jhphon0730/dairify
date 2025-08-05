@@ -7,6 +7,7 @@ import (
 
 	"github.com/jhphon0730/dairify/internal/auth"
 	"github.com/jhphon0730/dairify/internal/dto"
+	"github.com/jhphon0730/dairify/internal/redis"
 	"github.com/jhphon0730/dairify/internal/repository"
 	"github.com/jhphon0730/dairify/pkg/apperror"
 	"github.com/jhphon0730/dairify/pkg/utils"
@@ -78,7 +79,7 @@ func (s *userService) SigninUser(ctx context.Context, userSigninDTO dto.UserSign
 	}
 
 	// JWT 토큰 생성 ( access, refresh )
-	acessToken, err := auth.GenerateJWTToken(user.ID)
+	accessToken, err := auth.GenerateJWTToken(user.ID)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -88,8 +89,18 @@ func (s *userService) SigninUser(ctx context.Context, userSigninDTO dto.UserSign
 		return nil, http.StatusInternalServerError, err
 	}
 
+	// AccessToken을 Redis에 저장
+	userRedisClient, err := redis.GetUserRedis(ctx)
+	if err != nil {
+		return nil, http.StatusInternalServerError, apperror.ErrInternalServerError
+	}
+
+	if err := userRedisClient.SetUserToken(ctx, user.ID, accessToken); err != nil {
+		return nil, http.StatusInternalServerError, apperror.ErrInternalServerError
+	}
+
 	return &dto.UserSigninResponseDTO{
-		AccessToken:  acessToken,
+		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		User:         user,
 	}, http.StatusOK, nil

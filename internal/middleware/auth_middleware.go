@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/jhphon0730/dairify/internal/auth"
+	"github.com/jhphon0730/dairify/internal/redis"
 	"github.com/jhphon0730/dairify/internal/response"
 	"github.com/jhphon0730/dairify/pkg/apperror"
 )
@@ -42,7 +43,34 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 		// 컨텍스트에 사용자 ID 추가
 		userID := claims.UserID
-		ctx := context.WithValue(r.Context(), USER_ID_CTX_KEY, int64(userID)) // 사용자 정의 타입 키 사용
+
+		// redis 클라이언트에서 사용자 토큰 검증
+		userRedisClient, err := redis.GetUserRedis(r.Context())
+		if err != nil {
+			response.Error(w, http.StatusInternalServerError, apperror.ErrInternalServerError.Error())
+			return
+		}
+
+		// 사용자 토큰을 redis에서 가져옴
+		storedToken, err := userRedisClient.GetUserToken(r.Context(), userID)
+		if err != nil {
+			// 토큰을 가져오는 중 에러 발생 시
+			response.Error(w, http.StatusUnauthorized, apperror.ErrAuthInvalidToken.Error())
+			return
+		}
+		if storedToken == "" {
+			// 저장된 토큰이 없는 경우
+			response.Error(w, http.StatusUnauthorized, apperror.ErrAuthInvalidToken.Error())
+			return
+		}
+		if storedToken != token {
+			// 저장된 토큰과 요청 토큰이 일치하지 않는 경우
+			response.Error(w, http.StatusUnauthorized, apperror.ErrAuthInvalidToken.Error())
+			return
+		}
+
+		// 사용자 ID를 컨텍스트에 추가
+		ctx := context.WithValue(r.Context(), USER_ID_CTX_KEY, int64(userID))
 		next(w, r.WithContext(ctx))
 	}
 }
