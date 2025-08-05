@@ -40,7 +40,7 @@ func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 
 	// body로 Input 받기
 	var inp dto.UserSignupDTO
-	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil && err.Error() != "EOF" {
 		response.Error(w, http.StatusBadRequest, "Bad Request: "+err.Error())
 		return
 	}
@@ -68,7 +68,7 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 
 	// body로 Input 받기
 	var inp dto.UserSigninDTO
-	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil && err.Error() != "EOF" {
 		response.Error(w, http.StatusBadRequest, "Bad Request: "+err.Error())
 		return
 	}

@@ -36,7 +36,7 @@ func (h *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 	}
 
 	var createCategoryDTO dto.CreateCategoryDTO
-	if err := json.NewDecoder(r.Body).Decode(&createCategoryDTO); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&createCategoryDTO); err != nil && err.Error() != "EOF" {
 		response.Error(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
 		return
 	}
