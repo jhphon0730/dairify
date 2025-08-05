@@ -36,5 +36,6 @@ func RegisterHealthRoutes(mux *http.ServeMux) {
 func RegisterUserRoutes(mux *http.ServeMux, userHandler handler.UserHandler) {
 	mux.HandleFunc("/api/v1/users/signup/", userHandler.SignupUser)                              // 회원가입
 	mux.HandleFunc("/api/v1/users/signin/", userHandler.SigninUser)                              // 로그인
+	mux.HandleFunc("/api/v1/users/signout/", middleware.AuthMiddleware(userHandler.SignoutUser)) // 로그아웃
 	mux.HandleFunc("/api/v1/users/profile/", middleware.AuthMiddleware(userHandler.ProfileUser)) // 프로필 조회
 }

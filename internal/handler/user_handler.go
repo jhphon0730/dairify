@@ -15,6 +15,7 @@ import (
 type UserHandler interface {
 	SignupUser(w http.ResponseWriter, r *http.Request)
 	SigninUser(w http.ResponseWriter, r *http.Request)
+	SignoutUser(w http.ResponseWriter, r *http.Request)
 	ProfileUser(w http.ResponseWriter, r *http.Request)
 }
 
@@ -90,6 +91,32 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, status, "User signed in successfully", signinResponse)
+}
+
+/*
+SignoutUser 함수는 사용자를 로그아웃하는 핸들러입니다.
+curl -X POST http://localhost:8080/api/v1/users/signout/ \
+-H "Authorization: Bearer <token>"
+*/
+func (h *userHandler) SignoutUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
+		return
+	}
+
+	status, err := h.userService.SignoutUser(r.Context(), userID)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Error: "+err.Error())
+		return
+	}
+
+	response.Success(w, status, "User signed out successfully", nil)
 }
 
 /*

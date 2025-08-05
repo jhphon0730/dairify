@@ -17,6 +17,7 @@ import (
 type UserService interface {
 	SignupUser(ctx context.Context, userSignupDTO dto.UserSignupDTO) (int64, int, error)
 	SigninUser(ctx context.Context, userSigninDTO dto.UserSigninDTO) (*dto.UserSigninResponseDTO, int, error)
+	SignoutUser(ctx context.Context, userID int64) (int, error)
 	Profile(ctx context.Context, userID int64) (*dto.UserProfileResponseDTO, int, error)
 }
 
@@ -104,6 +105,17 @@ func (s *userService) SigninUser(ctx context.Context, userSigninDTO dto.UserSign
 		RefreshToken: refreshToken,
 		User:         user,
 	}, http.StatusOK, nil
+}
+
+// SignoutUser 함수는 사용자를 로그아웃합니다.
+func (s *userService) SignoutUser(ctx context.Context, userID int64) (int, error) {
+	userRedisClient, err := redis.GetUserRedis(ctx)
+	if err != nil {
+		return http.StatusInternalServerError, apperror.ErrInternalServerError
+	}
+
+	userRedisClient.DeleteUserToken(ctx, userID)
+	return http.StatusOK, nil
 }
 
 // Profile 함수는 사용자의 프로필 정보를 반환합니다.
