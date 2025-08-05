@@ -50,7 +50,7 @@ func (h *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 
 	category, statusCode, err := h.categoryService.CreateCategory(r.Context(), createCategoryDTO)
 	if err != nil {
-		response.Error(w, statusCode, "Error creating category: "+err.Error())
+		response.Error(w, statusCode, err.Error())
 		return
 	}
 
