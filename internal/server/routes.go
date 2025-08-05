@@ -14,14 +14,19 @@ import (
 func SetupRoutes(mux *http.ServeMux, db *database.DB) {
 	userRepository := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepository)
+	categoryRepository := repository.NewCategoryRepository(db)
+	categoryService := service.NewCategoryService(categoryRepository)
 
 	userHandler := handler.NewUserHandler(userService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	// HTTP 연결 상태 확인 라우트 설정
 	RegisterHealthRoutes(mux)
 
 	// 사용자 관련 라우트 설정
 	RegisterUserRoutes(mux, userHandler)
+	// 카테고리 관련 라우트 설정
+	RegisterCategoryRoutes(mux, categoryHandler)
 }
 
 // RegisterHealthRoutes는 헬스 체크 라우트를 등록합니다.
@@ -42,4 +47,13 @@ func RegisterUserRoutes(mux *http.ServeMux, userHandler handler.UserHandler) {
 	api_v1_users.HandleFunc("/profile/", middleware.ChainLoggingWithAuthMiddleware(userHandler.ProfileUser)) // 프로필 조회
 
 	mux.Handle("/api/v1/users/", http.StripPrefix("/api/v1/users", api_v1_users))
+}
+
+// RegisterCateogoryRoutes는 카테고리 관련 라우트를 등록합니다.
+func RegisterCategoryRoutes(mux *http.ServeMux, categoryHandler handler.CategoryHandler) {
+	api_v1_categories := http.NewServeMux()
+
+	api_v1_categories.HandleFunc("/create/", middleware.ChainLoggingWithAuthMiddleware(categoryHandler.CreateCategory)) // 카테고리 목록 조회
+
+	mux.Handle("/api/v1/categories/", http.StripPrefix("/api/v1/categories", api_v1_categories))
 }
