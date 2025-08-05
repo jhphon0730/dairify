@@ -10,7 +10,7 @@ var (
 	ErrUserNotFound     = errors.New("사용자를 찾을 수 없습니다")
 	ErrAuthUnauthorized = errors.New("인증되지 않은 요청입니다")
 
-	ErrUserSignupUserNameRequired = errors.New("ID는 필수 입력값입니다")
+	ErrUserSignupUserNameRequired = errors.New("아이디는 필수 입력값입니다")
 	ErrUserSignupNicknameRequired = errors.New("닉네임은 필수 입력값입니다")
 	ErrUserSignupPasswordRequired = errors.New("비밀번호는 필수 입력값입니다")
 	ErrUserSignupEmailRequired    = errors.New("이메일은 필수 입력값입니다")
