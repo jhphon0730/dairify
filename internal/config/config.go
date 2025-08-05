@@ -19,12 +19,10 @@ type Postgres struct {
 
 type Redis struct {
 	Host     string
+	Port     string
 	Password string
 
 	USER_DB int
-	CoupleInvitationDB int
-	DiaryDB int
-	ScheduleDB int
 }
 
 type Config struct {
@@ -70,12 +68,10 @@ func LoadConfig() (*Config, error) {
 			TIMEZONE:    getEnv("TIMEZONE", "Asia/Shanghai"),
 		},
 		Redis: Redis{
-			Host:     getEnv("REDIS_HOST", "localhost:6379"),
+			Host:     getEnv("REDIS_HOST", "localhost"),
+			Port:     getEnv("REDIS_PORT", "6379"),
 			Password: getEnv("REDIS_PASSWORD", ""),
 			USER_DB:  0,
-			CoupleInvitationDB: 1,
-			DiaryDB: 2,
-			ScheduleDB: 3,
 		},
 		JWT_SECRET: getEnv("JWT_SECRET", ""),
 		CHAR_SET:   getEnv("CHAR_SET", "asdqwe123"),
