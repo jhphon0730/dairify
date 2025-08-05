@@ -28,13 +28,7 @@ func NewCategoryHandler(categoryService service.CategoryService) CategoryHandler
 	}
 }
 
-/*
-CreateCategory 함수는 새로운 카테고리를 생성하는 HTTP 핸들러입니다.
-curl -X POST http://localhost:8080/api/v1/categories/create/ \
--H "Content-Type: application/json" \
--H "Authorization: Bearer <token>" \
--d '{"name":"나만의카테고리"}'
-*/
+/* CreateCategory 함수는 새로운 카테고리를 생성하는 HTTP 핸들러입니다. */
 func (h *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
@@ -54,7 +48,6 @@ func (h *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 	}
 	createCategoryDTO.CreatorID = userID
 
-	// 카테고리를 생성합니다.
 	category, statusCode, err := h.categoryService.CreateCategory(r.Context(), createCategoryDTO)
 	if err != nil {
 		response.Error(w, statusCode, "Error creating category: "+err.Error())

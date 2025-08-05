@@ -31,12 +31,7 @@ func NewUserHandler(userService service.UserService) UserHandler {
 	}
 }
 
-/*
-SignupUser 함수는 새로운 사용자를 등록하는 핸들러입니다.
-curl -X POST http://localhost:8080/api/v1/users/signup/ \
--H "Content-Type: application/json" \
--d '{"username":"testuser","nickname":"Test","password":"password123","email":"test@example.com"}'
-*/
+/* SignupUser 함수는 새로운 사용자를 등록하는 핸들러입니다. */
 func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
@@ -64,12 +59,7 @@ func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, status, "User signed up successfully", res)
 }
 
-/*
-SigninUser 함수는 사용자를 로그인하는 핸들러입니다.
-curl -X POST http://localhost:8080/api/v1/users/signin/ \
--H "Content-Type: application/json" \
--d '{"username":"testuser","password":"password123"}'
-*/
+/* SigninUser 함수는 사용자를 로그인하는 핸들러입니다. */
 func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
@@ -93,11 +83,7 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, status, "User signed in successfully", signinResponse)
 }
 
-/*
-SignoutUser 함수는 사용자를 로그아웃하는 핸들러입니다.
-curl -X POST http://localhost:8080/api/v1/users/signout/ \
--H "Authorization: Bearer <token>"
-*/
+/* SignoutUser 함수는 사용자를 로그아웃하는 핸들러입니다. */
 func (h *userHandler) SignoutUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
@@ -119,11 +105,7 @@ func (h *userHandler) SignoutUser(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, status, "User signed out successfully", nil)
 }
 
-/*
-ProfileUser 함수는 사용자의 프로필 정보를 조회하는 핸들러입니다.
-curl -X GET http://localhost:8080/api/v1/users/profile/ \
--H "Authorization: Bearer <token>"
-*/
+/* ProfileUser 함수는 사용자의 프로필 정보를 조회하는 핸들러입니다. */
 func (h *userHandler) ProfileUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
