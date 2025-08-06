@@ -14,6 +14,7 @@ import (
 // CategoryHandler는 카테고리 관련 HTTP 요청을 처리하는 인터페이스입니다.
 type CategoryHandler interface {
 	CreateCategory(w http.ResponseWriter, r *http.Request)
+	GetCategoriesByCreatorID(w http.ResponseWriter, r *http.Request)
 }
 
 // categoryHandler 구조체는 CategoryHandler 인터페이스를 구현합니다.
@@ -59,4 +60,30 @@ func (h *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 	}
 
 	response.Success(w, http.StatusCreated, "Category created successfully", res)
+}
+
+// GetCategoriesByCreatorID 함수는 주어진 생성자 ID로 카테고리 목록을 조회하는 HTTP 핸들러입니다.
+func (h *categoryHandler) GetCategoriesByCreatorID(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
+		return
+	}
+
+	categories, statusCode, err := h.categoryService.GetCategoriesByCreatorID(r.Context(), userID)
+	if err != nil {
+		response.Error(w, statusCode, "Error retrieving categories: "+err.Error())
+		return
+	}
+
+	res := dto.GetCategoriesResponseDTO{
+		Categories: categories,
+	}
+
+	response.Success(w, http.StatusOK, "Categories retrieved successfully", res)
 }

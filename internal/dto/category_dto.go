@@ -27,3 +27,8 @@ func (d *CreateCategoryDTO) CheckIsValidInput() error {
 type CreateCategoryResponseDTO struct {
 	Category *model.Category `json:"category"`
 }
+
+// GetCategoriesResponseDTO 구조체는 카테고리 목록 조회 응답을 위한 데이터 전송 객체입니다.
+type GetCategoriesResponseDTO struct {
+	Categories []model.Category `json:"categories"`
+}

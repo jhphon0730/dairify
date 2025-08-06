@@ -12,6 +12,7 @@ import (
 // CategoryService 인터페이스는 카테고리 관련 서비스의 메서드를 정의합니다.
 type CategoryService interface {
 	CreateCategory(ctx context.Context, createCategoryDTO dto.CreateCategoryDTO) (*model.Category, int, error)
+	GetCategoriesByCreatorID(ctx context.Context, creatorID int64) ([]model.Category, int, error)
 }
 
 // categoryService 구조체는 CategoryService 인터페이스를 구현합니다.
@@ -42,4 +43,13 @@ func (s *categoryService) CreateCategory(ctx context.Context, createCategoryDTO 
 	}
 
 	return category, http.StatusCreated, nil
+}
+
+// GetCategoriesByCreatorID 함수는 주어진 생성자 ID로 카테고리 목록을 조회합니다.
+func (s *categoryService) GetCategoriesByCreatorID(ctx context.Context, creatorID int64) ([]model.Category, int, error) {
+	categories, err := s.categoryRepository.GetCategoriesByCreatorID(ctx, creatorID)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	return categories, http.StatusOK, nil
 }

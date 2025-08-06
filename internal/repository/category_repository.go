@@ -57,6 +57,10 @@ func (r *categoryRepository) GetCategoriesByCreatorID(ctx context.Context, creat
 	`
 
 	rows, err := r.db.DB.QueryContext(ctx, query, creatorID)
+	// 만약 카테고리가 존재하지 않는다면, 빈 슬라이스를 반환합니다.
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, apperror.ErrGetFailedInternalServerError
 	}

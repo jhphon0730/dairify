@@ -53,7 +53,8 @@ func RegisterUserRoutes(mux *http.ServeMux, userHandler handler.UserHandler) {
 func RegisterCategoryRoutes(mux *http.ServeMux, categoryHandler handler.CategoryHandler) {
 	api_v1_categories := http.NewServeMux()
 
-	api_v1_categories.HandleFunc("/create/", middleware.ChainLoggingWithAuthMiddleware(categoryHandler.CreateCategory)) // 카테고리 목록 조회
+	api_v1_categories.HandleFunc("/create/", middleware.ChainLoggingWithAuthMiddleware(categoryHandler.CreateCategory))         // 카테고리 생성
+	api_v1_categories.HandleFunc("/list/", middleware.ChainLoggingWithAuthMiddleware(categoryHandler.GetCategoriesByCreatorID)) // 카테고리 목록 조회
 
 	mux.Handle("/api/v1/categories/", http.StripPrefix("/api/v1/categories", api_v1_categories))
 }
