@@ -11,10 +11,10 @@
 - [ ] User - Change Password
 - [ ] User - Update JWT token
 - [x] Category - Create Category
-- [ ] Category - Get Category List
+- [x] Category - Get Category List
 - [ ] Category - Get Category Detail
-- [ ] Category - Update Category
-- [ ] Category - Delete Category
+- [x] Category - Update Category
+- [x] Category - Delete Category
 
 
 ## Frontend
