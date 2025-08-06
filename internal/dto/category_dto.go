@@ -32,3 +32,23 @@ type CreateCategoryResponseDTO struct {
 type GetCategoriesResponseDTO struct {
 	Categories []model.Category `json:"categories"`
 }
+
+// UpdateCategoryDTO 구조체는 카테고리 이름 업데이트를 위한 데이터 전송 객체입니다.
+type UpdateCategoryDTO struct {
+	ID        int64  `json:"id"`
+	CreatorID int64  `json:"creator_id"`
+	Name      string `json:"name" binding:"required"`
+}
+
+// CheckIsValidInput 함수는 카테고리 이름 업데이트 입력 값을 확인해주는 함수입니다.
+func (d *UpdateCategoryDTO) CheckIsValidInput() error {
+	if d.Name == "" {
+		return apperror.ErrCategoryNameRequired
+	}
+	return nil
+}
+
+// UpdateCategoryResponseDTO 구조체는 카테고리 이름 업데이트 응답을 위한 데이터 전송 객체입니다.
+type UpdateCategoryResponseDTO struct {
+	Category *model.Category `json:"category"`
+}

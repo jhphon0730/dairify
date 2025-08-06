@@ -14,6 +14,8 @@ import (
 type CategoryRepository interface {
 	CreateCategory(ctx context.Context, category *model.Category) error
 	GetCategoriesByCreatorID(ctx context.Context, creatorID int64) ([]model.Category, error)
+	GetCategoryByID(ctx context.Context, id int64, creatorID int64) (*model.Category, error)
+	UpdateCategoryName(ctx context.Context, category *model.Category) error
 }
 
 // categoryRepository 구조체는 CategoryRepository 인터페이스를 구현합니다.
@@ -75,4 +77,49 @@ func (r *categoryRepository) GetCategoriesByCreatorID(ctx context.Context, creat
 	}
 
 	return categories, nil
+}
+
+// FindCategoryByID 함수는 주어진 ID와 생성자 ID로 카테고리를 조회합니다.
+func (r *categoryRepository) GetCategoryByID(ctx context.Context, id int64, creatorID int64) (*model.Category, error) {
+	query := `
+		SELECT id, name, creator_id, created_at
+		FROM categories
+		WHERE id = $1 AND creator_id = $2
+	`
+
+	var category model.Category
+	err := r.db.DB.QueryRowContext(ctx, query, id, creatorID).Scan(&category.ID, &category.Name, &category.CreatorID, &category.CreatedAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, apperror.ErrCategoryNotFound
+		}
+		return nil, apperror.ErrGetFailedInternalServerError
+	}
+
+	return &category, nil
+}
+
+// UpdateCategoryName 함수는 카테고리의 이름을 업데이트합니다.
+func (r *categoryRepository) UpdateCategoryName(ctx context.Context, category *model.Category) error {
+	query := `
+		UPDATE categories
+		SET name = $1
+		WHERE id = $2 AND creator_id = $3
+	`
+
+	result, err := r.db.DB.ExecContext(ctx, query, category.Name, category.ID, category.CreatorID)
+	if err != nil {
+		return apperror.ErrUpdateFailedInternalServerError
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return apperror.ErrUpdateFailedInternalServerError
+	}
+
+	if rowsAffected == 0 {
+		return apperror.ErrCategoryNotFound
+	}
+
+	return nil
 }
