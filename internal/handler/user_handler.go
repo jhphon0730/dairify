@@ -74,12 +74,16 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Service 함수 호출
-	signinResponse, status, err := h.userService.SigninUser(r.Context(), inp)
+	accessToken, refreshToken, status, err := h.userService.SigninUser(r.Context(), inp)
 	if err != nil {
 		response.Error(w, status, "Error: "+err.Error())
 		return
 	}
 
+	signinResponse := dto.UserSigninResponseDTO{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
 	response.Success(w, status, "User signed in successfully", signinResponse)
 }
 
@@ -118,11 +122,14 @@ func (h *userHandler) ProfileUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profileResponse, status, err := h.userService.Profile(r.Context(), userID)
+	user, status, err := h.userService.Profile(r.Context(), userID)
 	if err != nil {
 		response.Error(w, status, "Error: "+err.Error())
 		return
 	}
 
-	response.Success(w, status, "User profile retrieved successfully", profileResponse)
+	res := dto.UserProfileResponseDTO{
+		User: user,
+	}
+	response.Success(w, status, "User profile retrieved successfully", res)
 }
