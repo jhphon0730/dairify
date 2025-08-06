@@ -16,6 +16,7 @@ type CategoryRepository interface {
 	GetCategoriesByCreatorID(ctx context.Context, creatorID int64) ([]model.Category, error)
 	GetCategoryByID(ctx context.Context, id int64, creatorID int64) (*model.Category, error)
 	UpdateCategoryName(ctx context.Context, category *model.Category) error
+	DeleteCategory(ctx context.Context, categoryID int64, creatorID int64) error
 }
 
 // categoryRepository 구조체는 CategoryRepository 인터페이스를 구현합니다.
@@ -119,6 +120,23 @@ func (r *categoryRepository) UpdateCategoryName(ctx context.Context, category *m
 
 	if rowsAffected == 0 {
 		return apperror.ErrCategoryNotFound
+	}
+
+	return nil
+}
+
+// DeleteCategory 함수는 카테고리를 삭제합니다.
+func (r *categoryRepository) DeleteCategory(ctx context.Context, categoryID int64, creatorID int64) error {
+	query := `
+		DELETE FROM categories
+		WHERE id = $1 AND creator_id = $2
+	`
+
+	if _, err := r.db.DB.ExecContext(ctx, query, categoryID, creatorID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return apperror.ErrCategoryNotFound
+		}
+		return apperror.ErrCategoryDeleteForbidden
 	}
 
 	return nil

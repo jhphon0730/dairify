@@ -9,6 +9,7 @@ var (
 	ErrCreateFailedInternalServerError = errors.New("서버 내부 오류로 카테고리 생성에 실패했습니다")
 	ErrGetFailedInternalServerError    = errors.New("서버 내부 오류로 카테고리 조회에 실패했습니다")
 	ErrUpdateFailedInternalServerError = errors.New("서버 내부 오류로 카테고리 업데이트에 실패했습니다")
+	ErrCategoryDeleteForbidden         = errors.New("카테고리 삭제 권한이 없습니다")
 
 	ErrCategoryNameRequired      = errors.New("카테고리 이름은 필수입니다")
 	ErrCategoryCreatorIDRequired = errors.New("카테고리 생성자 ID는 필수입니다")

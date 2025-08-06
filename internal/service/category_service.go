@@ -16,6 +16,7 @@ type CategoryService interface {
 	CreateCategory(ctx context.Context, createCategoryDTO dto.CreateCategoryDTO) (*model.Category, int, error)
 	GetCategoriesByCreatorID(ctx context.Context, creatorID int64) ([]model.Category, int, error)
 	UpdateCategoryName(ctx context.Context, updateCategoryDTO dto.UpdateCategoryDTO) (*model.Category, int, error)
+	DeleteCategory(ctx context.Context, categoryID int64, creatorID int64) (int, error)
 }
 
 // categoryService 구조체는 CategoryService 인터페이스를 구현합니다.
@@ -84,4 +85,30 @@ func (s *categoryService) UpdateCategoryName(ctx context.Context, updateCategory
 	}
 
 	return category, http.StatusOK, nil
+}
+
+// DeleteCategory 함수는 카테고리를 삭제합니다.
+func (s *categoryService) DeleteCategory(ctx context.Context, categoryID int64, creatorID int64) (int, error) {
+	if categoryID <= 0 {
+		return http.StatusBadRequest, apperror.ErrCategoryIDIsRequired
+	}
+
+	category, err := s.categoryRepository.GetCategoryByID(ctx, categoryID, creatorID)
+	if err != nil {
+		if errors.Is(err, apperror.ErrCategoryNotFound) {
+			return http.StatusNotFound, apperror.ErrCategoryNotFound
+		}
+		return http.StatusInternalServerError, err
+	}
+
+	// 카테고리의 생성자 ID가 요청한 사용자 ID와 일치하는지 확인
+	if category.CreatorID != creatorID {
+		return http.StatusForbidden, apperror.ErrCategoryDeleteForbidden
+	}
+
+	if err := s.categoryRepository.DeleteCategory(ctx, categoryID, creatorID); err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusNoContent, nil
 }

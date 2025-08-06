@@ -17,6 +17,7 @@ type CategoryHandler interface {
 	CreateCategory(w http.ResponseWriter, r *http.Request)
 	GetCategoriesByCreatorID(w http.ResponseWriter, r *http.Request)
 	UpdateCategory(w http.ResponseWriter, r *http.Request)
+	DeleteCategory(w http.ResponseWriter, r *http.Request)
 }
 
 // categoryHandler 구조체는 CategoryHandler 인터페이스를 구현합니다.
@@ -130,4 +131,32 @@ func (h *categoryHandler) UpdateCategory(w http.ResponseWriter, r *http.Request)
 	}
 
 	response.Success(w, http.StatusOK, "Category updated successfully", res)
+}
+
+// DeleteCategory 함수는 카테고리를 삭제하는 HTTP 핸들러입니다.
+func (h *categoryHandler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	id := r.PathValue("id")
+	if id == "" {
+		response.Error(w, http.StatusBadRequest, apperror.ErrCategoryIDIsRequired.Error())
+		return
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
+		return
+	}
+
+	statusCode, err := h.categoryService.DeleteCategory(r.Context(), utils.InterfaceToInt64(id), userID)
+	if err != nil {
+		response.Error(w, statusCode, "Error deleting category: "+err.Error())
+		return
+	}
+
+	response.Success(w, http.StatusOK, "Category deleted successfully", nil)
 }
