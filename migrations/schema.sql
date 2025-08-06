@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     creator_id INTEGER REFERENCES users(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_category_per_user UNIQUE (name, creator_id)
 );
 
 CREATE TABLE IF NOT EXISTS diaries (
