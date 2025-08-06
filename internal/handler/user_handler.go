@@ -41,14 +41,14 @@ func (h *userHandler) SignupUser(w http.ResponseWriter, r *http.Request) {
 	// body로 Input 받기
 	var inp dto.UserSignupDTO
 	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil && err.Error() != "EOF" {
-		response.Error(w, http.StatusBadRequest, "Bad Request: "+err.Error())
+		response.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	// Service 함수 호출
 	signupID, status, err := h.userService.SignupUser(r.Context(), inp)
 	if err != nil {
-		response.Error(w, status, "Error: "+err.Error())
+		response.Error(w, status, err.Error())
 		return
 	}
 
@@ -69,14 +69,14 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	// body로 Input 받기
 	var inp dto.UserSigninDTO
 	if err := json.NewDecoder(r.Body).Decode(&inp); err != nil && err.Error() != "EOF" {
-		response.Error(w, http.StatusBadRequest, "Bad Request: "+err.Error())
+		response.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	// Service 함수 호출
 	accessToken, refreshToken, status, err := h.userService.SigninUser(r.Context(), inp)
 	if err != nil {
-		response.Error(w, status, "Error: "+err.Error())
+		response.Error(w, status, err.Error())
 		return
 	}
 
@@ -102,7 +102,7 @@ func (h *userHandler) SignoutUser(w http.ResponseWriter, r *http.Request) {
 
 	status, err := h.userService.SignoutUser(r.Context(), userID)
 	if err != nil {
-		response.Error(w, http.StatusInternalServerError, "Error: "+err.Error())
+		response.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -124,7 +124,7 @@ func (h *userHandler) ProfileUser(w http.ResponseWriter, r *http.Request) {
 
 	user, status, err := h.userService.Profile(r.Context(), userID)
 	if err != nil {
-		response.Error(w, status, "Error: "+err.Error())
+		response.Error(w, status, err.Error())
 		return
 	}
 

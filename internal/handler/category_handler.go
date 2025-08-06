@@ -41,7 +41,7 @@ func (h *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 
 	var createCategoryDTO dto.CreateCategoryDTO
 	if err := json.NewDecoder(r.Body).Decode(&createCategoryDTO); err != nil && err.Error() != "EOF" {
-		response.Error(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		response.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -80,7 +80,7 @@ func (h *categoryHandler) GetCategoriesByCreatorID(w http.ResponseWriter, r *htt
 
 	categories, statusCode, err := h.categoryService.GetCategoriesByCreatorID(r.Context(), userID)
 	if err != nil {
-		response.Error(w, statusCode, "Error retrieving categories: "+err.Error())
+		response.Error(w, statusCode, err.Error())
 		return
 	}
 
@@ -106,7 +106,7 @@ func (h *categoryHandler) UpdateCategory(w http.ResponseWriter, r *http.Request)
 
 	var updateCategoryDTO dto.UpdateCategoryDTO
 	if err := json.NewDecoder(r.Body).Decode(&updateCategoryDTO); err != nil && err.Error() != "EOF" {
-		response.Error(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		response.Error(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -122,7 +122,7 @@ func (h *categoryHandler) UpdateCategory(w http.ResponseWriter, r *http.Request)
 
 	category, statusCode, err := h.categoryService.UpdateCategoryName(r.Context(), updateCategoryDTO)
 	if err != nil {
-		response.Error(w, statusCode, "Error updating category: "+err.Error())
+		response.Error(w, statusCode, err.Error())
 		return
 	}
 
@@ -154,7 +154,7 @@ func (h *categoryHandler) DeleteCategory(w http.ResponseWriter, r *http.Request)
 
 	statusCode, err := h.categoryService.DeleteCategory(r.Context(), utils.InterfaceToInt64(id), userID)
 	if err != nil {
-		response.Error(w, statusCode, "Error deleting category: "+err.Error())
+		response.Error(w, statusCode, err.Error())
 		return
 	}
 
