@@ -15,6 +15,7 @@ import (
 // DiaryRepository는 일기 관련 데이터베이스 작업을 처리하는 인터페이스입니다.
 type DiaryRepository interface {
 	GetDiariesByCreatorID(ctx context.Context, creatorID int64, params url.Values) ([]model.Diary, error)
+	CreateDiary(ctx context.Context, diary *model.Diary) error
 }
 
 // diaryRepository 구조체는 DiaryRepository 인터페이스를 구현합니다.
@@ -33,7 +34,7 @@ func NewDiaryRepository(db *database.DB) DiaryRepository {
 func (r *diaryRepository) GetDiariesByCreatorID(ctx context.Context, creatorID int64, params url.Values) ([]model.Diary, error) {
 	var diaries []model.Diary
 
-	query := "SELECT id, title, content, creator_id, created_at, updated_at FROM diaries WHERE creator_id = $1"
+	query := "SELECT id, title, content, creator_id, category_id, created_at, updated_at FROM diaries WHERE creator_id = $1"
 	args := []interface{}{creatorID}
 	argIdx := 2 // $2부터 시작
 
@@ -55,8 +56,6 @@ func (r *diaryRepository) GetDiariesByCreatorID(ctx context.Context, creatorID i
 	// 정렬 조건 추가
 	query += " ORDER BY created_at DESC"
 
-	fmt.Println("Executing query:", query, "with args:", args)
-
 	rows, err := r.db.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -68,7 +67,7 @@ func (r *diaryRepository) GetDiariesByCreatorID(ctx context.Context, creatorID i
 
 	for rows.Next() {
 		var diary model.Diary
-		if err := rows.Scan(&diary.ID, &diary.Title, &diary.Content, &diary.CreatorID, &diary.CreatedAt, &diary.UpdatedAt); err != nil {
+		if err := rows.Scan(&diary.ID, &diary.Title, &diary.Content, &diary.CreatorID, &diary.CategoryID, &diary.CreatedAt, &diary.UpdatedAt); err != nil {
 			return nil, err
 		}
 		diaries = append(diaries, diary)
@@ -76,4 +75,14 @@ func (r *diaryRepository) GetDiariesByCreatorID(ctx context.Context, creatorID i
 
 	// 결과 반환
 	return diaries, nil
+}
+
+// CreateDiary 함수는 새로운 일기를 생성합니다.
+func (r *diaryRepository) CreateDiary(ctx context.Context, diary *model.Diary) error {
+	query := "INSERT INTO diaries (title, content, creator_id, category_id) VALUES ($1, $2, $3, $4) RETURNING id"
+	err := r.db.DB.QueryRowContext(ctx, query, diary.Title, diary.Content, diary.CreatorID, diary.CategoryID).Scan(&diary.ID)
+	if err != nil {
+		return fmt.Errorf("failed to create diary: %w", err)
+	}
+	return nil
 }

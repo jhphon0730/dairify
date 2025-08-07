@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/jhphon0730/dairify/internal/dto"
@@ -13,6 +14,7 @@ import (
 // DiaryHandler는 일기 관련 HTTP 요청을 처리하는 인터페이스입니다.
 type DiaryHandler interface {
 	GetDiariesByCreatorID(w http.ResponseWriter, r *http.Request)
+	CreateDiary(w http.ResponseWriter, r *http.Request)
 }
 
 // diaryHandler 구조체는 DiaryHandler 인터페이스를 구현합니다.
@@ -52,4 +54,36 @@ func (h *diaryHandler) GetDiariesByCreatorID(w http.ResponseWriter, r *http.Requ
 	}
 
 	response.Success(w, http.StatusOK, "Diary list retrieved successfully", res)
+}
+
+// CreateDiary 함수는 새로운 일기를 생성하는 HTTP 핸들러입니다.
+func (h *diaryHandler) CreateDiary(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
+		return
+	}
+
+	var createDiaryDTO dto.CreateDiaryDTO
+	if err := json.NewDecoder(r.Body).Decode(&createDiaryDTO); err != nil && err.Error() != "EOF" {
+		response.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	diary, err := h.diaryService.CreateDiary(r.Context(), createDiaryDTO, userID)
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	res := dto.CreateDiaryResponseDTO{
+		Diary: diary,
+	}
+
+	response.Success(w, http.StatusCreated, "Diary created successfully", res)
 }

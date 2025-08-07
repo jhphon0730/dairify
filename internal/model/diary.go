@@ -4,7 +4,7 @@ package model
 type Diary struct {
 	ID         int64  `json:"id"`
 	CreatorID  int64  `json:"creator_id"`
-	CategoryID int64  `json:"category_id,omitempty"`
+	CategoryID *int64 `json:"category_id,omitempty"`
 	Title      string `json:"title"`
 	Content    string `json:"content"`
 	CreatedAt  string `json:"created_at"`
