@@ -36,11 +36,7 @@ func (s *categoryService) CreateCategory(ctx context.Context, createCategoryDTO 
 	if err := createCategoryDTO.CheckIsValidInput(); err != nil {
 		return nil, http.StatusBadRequest, err
 	}
-
-	category := &model.Category{
-		Name:      createCategoryDTO.Name,
-		CreatorID: createCategoryDTO.CreatorID,
-	}
+	category := createCategoryDTO.ToModel()
 
 	if err := s.categoryRepository.CreateCategory(ctx, category); err != nil {
 		return nil, http.StatusInternalServerError, err

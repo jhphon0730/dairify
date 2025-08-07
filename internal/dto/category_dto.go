@@ -23,6 +23,14 @@ func (d *CreateCategoryDTO) CheckIsValidInput() error {
 	return nil
 }
 
+// ToModel 함수는 CreateCategoryDTO를 model.Category로 변환합니다.
+func (d *CreateCategoryDTO) ToModel() *model.Category {
+	return &model.Category{
+		Name:      d.Name,
+		CreatorID: d.CreatorID,
+	}
+}
+
 // CreateCategoryResponse 구조체는 카테고리 생성 응답을 위한 데이터 전송 객체입니다.
 type CreateCategoryResponseDTO struct {
 	Category *model.Category `json:"category"`
