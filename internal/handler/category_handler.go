@@ -47,7 +47,7 @@ func (h *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 
 	userID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
 		return
 	}
 	createCategoryDTO.CreatorID = userID

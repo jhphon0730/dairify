@@ -16,17 +16,19 @@ func SetupRoutes(mux *http.ServeMux, db *database.DB) {
 	userService := service.NewUserService(userRepository)
 	categoryRepository := repository.NewCategoryRepository(db)
 	categoryService := service.NewCategoryService(categoryRepository)
+	diaryRepository := repository.NewDiaryRepository(db)
+	diaryService := service.NewDiaryService(diaryRepository)
 
 	userHandler := handler.NewUserHandler(userService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
+	diaryHandler := handler.NewDiaryHandler(diaryService)
 
 	// HTTP 연결 상태 확인 라우트 설정
 	RegisterHealthRoutes(mux)
 
-	// 사용자 관련 라우트 설정
 	RegisterUserRoutes(mux, userHandler)
-	// 카테고리 관련 라우트 설정
 	RegisterCategoryRoutes(mux, categoryHandler)
+	RegisterDiaryRoutes(mux, diaryHandler)
 }
 
 // RegisterHealthRoutes는 헬스 체크 라우트를 등록합니다.
@@ -59,4 +61,13 @@ func RegisterCategoryRoutes(mux *http.ServeMux, categoryHandler handler.Category
 	api_v1_categories.HandleFunc("/delete/{id}/", middleware.ChainLoggingWithAuthMiddleware(categoryHandler.DeleteCategory))    // 카테고리 삭제
 
 	mux.Handle("/api/v1/categories/", http.StripPrefix("/api/v1/categories", api_v1_categories))
+}
+
+// RegisterDiaryRoutes는 일기 관련 라우트를 등록합니다.
+func RegisterDiaryRoutes(mux *http.ServeMux, diaryHandler handler.DiaryHandler) {
+	api_v1_diaries := http.NewServeMux()
+
+	api_v1_diaries.HandleFunc("/list/", middleware.ChainLoggingWithAuthMiddleware(diaryHandler.GetDiariesByCreatorID)) // 일기 목록 조회
+
+	mux.Handle("/api/v1/diaries/", http.StripPrefix("/api/v1/diaries", api_v1_diaries))
 }

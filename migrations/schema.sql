@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE TABLE IF NOT EXISTS diaries (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
     title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS diaries (
     CONSTRAINT chk_content CHECK (LENGTH(content) > 0)
 );
 
-CREATE INDEX IF NOT EXISTS idx_diaries_user_id ON diaries(user_id);
+CREATE INDEX IF NOT EXISTS idx_diaries_creator_id ON diaries(creator_id);
 CREATE INDEX IF NOT EXISTS idx_diaries_category_id ON diaries(category_id);
