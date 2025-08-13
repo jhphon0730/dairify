@@ -40,7 +40,6 @@ func (r *categoryRepository) CreateCategory(ctx context.Context, category *model
 
 	err := r.db.DB.QueryRowContext(ctx, query, category.Name, category.CreatorID).Scan(&category.ID)
 	if err != nil {
-		// 만약 카테고리가 이미 존재한다면, 에러를 무시하고 nil을 반환합니다.
 		if errors.Is(err, sql.ErrNoRows) {
 			return apperror.ErrCategoryCreateDuplicateName
 		}
