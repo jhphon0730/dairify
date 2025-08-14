@@ -17,6 +17,7 @@ type DiaryHandler interface {
 	GetDiaryByID(w http.ResponseWriter, r *http.Request)
 	GetDiariesByCreatorID(w http.ResponseWriter, r *http.Request)
 	CreateDiary(w http.ResponseWriter, r *http.Request)
+	DeleteDiary(w http.ResponseWriter, r *http.Request)
 }
 
 // diaryHandler 구조체는 DiaryHandler 인터페이스를 구현합니다.
@@ -126,4 +127,37 @@ func (h *diaryHandler) CreateDiary(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, status, "Diary created successfully", res)
+}
+
+// DeleteDiary 함수는 일기를 소프트 삭제 처리하는 HTTP 핸들러입니다.
+func (h *diaryHandler) DeleteDiary(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	userID, ok := middleware.GetUserIDFromContext(r.Context())
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
+		return
+	}
+
+	idParam := r.PathValue("id")
+	if idParam == "" {
+		response.Error(w, http.StatusBadRequest, apperror.ErrDiaryNotFound.Error())
+		return
+	}
+	diaryID := utils.InterfaceToInt64(idParam)
+	if diaryID <= 0 {
+		response.Error(w, http.StatusBadRequest, apperror.ErrDiaryNotFound.Error())
+		return
+	}
+
+	status, err := h.diaryService.DeleteDiary(r.Context(), diaryID, userID)
+	if err != nil {
+		response.Error(w, status, err.Error())
+		return
+	}
+
+	response.Success(w, status, "Diary deleted successfully", nil)
 }

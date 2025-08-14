@@ -17,6 +17,7 @@ type DiaryRepository interface {
 	GetDiaryByID(ctx context.Context, diary *model.Diary) error
 	GetDiariesByCreatorID(ctx context.Context, creatorID int64, params url.Values) ([]model.Diary, error)
 	CreateDiary(ctx context.Context, diary *model.Diary) error
+	DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) error
 }
 
 // diaryRepository 구조체는 DiaryRepository 인터페이스를 구현합니다.
@@ -35,7 +36,8 @@ func NewDiaryRepository(db *database.DB) DiaryRepository {
 func (r *diaryRepository) GetDiariesByCreatorID(ctx context.Context, creatorID int64, params url.Values) ([]model.Diary, error) {
 	var diaries []model.Diary
 
-	query := "SELECT id, title, content, creator_id, category_id, created_at, updated_at FROM diaries WHERE creator_id = $1"
+	// 소프트 삭제된 레코드는 제외
+	query := "SELECT id, title, content, creator_id, category_id, created_at, updated_at, is_deleted, deleted_at FROM diaries WHERE creator_id = $1 AND is_deleted = FALSE"
 	args := []interface{}{creatorID}
 	argIdx := 2 // $2부터 시작
 
@@ -68,7 +70,7 @@ func (r *diaryRepository) GetDiariesByCreatorID(ctx context.Context, creatorID i
 
 	for rows.Next() {
 		var diary model.Diary
-		if err := rows.Scan(&diary.ID, &diary.Title, &diary.Content, &diary.CreatorID, &diary.CategoryID, &diary.CreatedAt, &diary.UpdatedAt); err != nil {
+		if err := rows.Scan(&diary.ID, &diary.Title, &diary.Content, &diary.CreatorID, &diary.CategoryID, &diary.CreatedAt, &diary.UpdatedAt, &diary.IsDeleted, &diary.DeletedAt); err != nil {
 			return nil, err
 		}
 		diaries = append(diaries, diary)
@@ -90,13 +92,31 @@ func (r *diaryRepository) CreateDiary(ctx context.Context, diary *model.Diary) e
 
 // GetDiaryByID 함수는 ID로 일기를 조회합니다.
 func (r *diaryRepository) GetDiaryByID(ctx context.Context, diary *model.Diary) error {
-	query := "SELECT id, title, content, creator_id, category_id, created_at, updated_at FROM diaries WHERE id = $1"
-	if err := r.db.DB.QueryRowContext(ctx, query, diary.ID).Scan(&diary.ID, &diary.Title, &diary.Content, &diary.CreatorID, &diary.CategoryID, &diary.CreatedAt, &diary.UpdatedAt); err != nil {
+	query := "SELECT id, title, content, creator_id, category_id, created_at, updated_at, is_deleted, deleted_at FROM diaries WHERE id = $1 AND is_deleted = FALSE"
+	if err := r.db.DB.QueryRowContext(ctx, query, diary.ID).Scan(&diary.ID, &diary.Title, &diary.Content, &diary.CreatorID, &diary.CategoryID, &diary.CreatedAt, &diary.UpdatedAt, &diary.IsDeleted, &diary.DeletedAt); err != nil {
 		// 조회 실패 시에는 id가 이상한 값이거나, 해당 일기가 존재하지 않는 경우
 		if errors.Is(err, sql.ErrNoRows) {
 			return apperror.ErrDiaryNotFound
 		}
 		return apperror.ErrDiaryGetInternal
+	}
+	return nil
+}
+
+// DeleteDiary 함수는 일기를 소프트 삭제 처리합니다.
+func (r *diaryRepository) DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) error {
+	// 작성자 조건을 추가하여 다른 사용자의 일기 삭제 방지
+	query := "UPDATE diaries SET is_deleted = TRUE, deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND creator_id = $2 AND is_deleted = FALSE"
+	res, err := r.db.DB.ExecContext(ctx, query, diaryID, creatorID)
+	if err != nil {
+		return apperror.ErrDiaryDeleteInternal
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return apperror.ErrDiaryDeleteInternal
+	}
+	if rows == 0 {
+		return apperror.ErrDiaryNotFound
 	}
 	return nil
 }

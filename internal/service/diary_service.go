@@ -17,6 +17,7 @@ type DiaryService interface {
 	GetDiaryByID(ctx context.Context, diaryID int64) (*model.Diary, int, error)
 	GetDiariesByCreatorID(ctx context.Context, creatorID int64, params url.Values) ([]model.Diary, int, error)
 	CreateDiary(ctx context.Context, diary dto.CreateDiaryDTO, creatorID int64) (*model.Diary, int, error)
+	DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) (int, error)
 }
 
 // diaryService 구조체는 DiaryService 인터페이스를 구현합니다.
@@ -70,4 +71,18 @@ func (s *diaryService) GetDiaryByID(ctx context.Context, diaryID int64) (*model.
 	}
 
 	return diary, http.StatusOK, nil
+}
+
+// DeleteDiary 함수는 일기를 소프트 삭제합니다.
+func (s *diaryService) DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) (int, error) {
+	if diaryID <= 0 {
+		return http.StatusBadRequest, apperror.ErrDiaryNotFound
+	}
+	if err := s.diaryRepository.DeleteDiary(ctx, diaryID, creatorID); err != nil {
+		if errors.Is(err, apperror.ErrDiaryNotFound) {
+			return http.StatusNotFound, err
+		}
+		return http.StatusInternalServerError, apperror.ErrDiaryDeleteInternal
+	}
+	return http.StatusOK, nil
 }
