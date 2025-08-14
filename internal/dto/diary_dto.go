@@ -45,3 +45,8 @@ func (dto *CreateDiaryDTO) ToModel(creatorID int64) *model.Diary {
 type CreateDiaryResponseDTO struct {
 	Diary *model.Diary `json:"diary"`
 }
+
+// GetDiaryByIDResponseDTO 구조체는 단일 일기 조회 응답을 위한 DTO입니다.
+type GetDiaryByIDResponseDTO struct {
+	Diary *model.Diary `json:"diary"`
+}

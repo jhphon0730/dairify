@@ -9,10 +9,12 @@ import (
 	"github.com/jhphon0730/dairify/internal/response"
 	"github.com/jhphon0730/dairify/internal/service"
 	"github.com/jhphon0730/dairify/pkg/apperror"
+	"github.com/jhphon0730/dairify/pkg/utils"
 )
 
 // DiaryHandler는 일기 관련 HTTP 요청을 처리하는 인터페이스입니다.
 type DiaryHandler interface {
+	GetDiaryByID(w http.ResponseWriter, r *http.Request)
 	GetDiariesByCreatorID(w http.ResponseWriter, r *http.Request)
 	CreateDiary(w http.ResponseWriter, r *http.Request)
 }
@@ -29,6 +31,44 @@ func NewDiaryHandler(diaryService service.DiaryService) DiaryHandler {
 	}
 }
 
+// GetDiaryByID 함수는 ID로 단일 일기를 조회하는 HTTP 핸들러입니다.
+func (h *diaryHandler) GetDiaryByID(w http.ResponseWriter, r *http.Request) {
+	// 메서드 검증
+	if r.Method != http.MethodGet {
+		response.Error(w, http.StatusMethodNotAllowed, apperror.ErrHttpMethodNotAllowed.Error())
+		return
+	}
+
+	// 경로 변수에서 id 추출 (예: /detail/{id}/)
+	idParam := r.PathValue("id")
+	if idParam == "" {
+		response.Error(w, http.StatusBadRequest, apperror.ErrDiaryNotFound.Error())
+		return
+	}
+
+	// 사용자 인증 정보 확인
+	if _, ok := middleware.GetUserIDFromContext(r.Context()); !ok {
+		response.Error(w, http.StatusUnauthorized, apperror.ErrAuthUnauthorized.Error())
+		return
+	}
+
+	// 문자열 ID -> int64 변환
+	diaryID := utils.InterfaceToInt64(idParam)
+	if diaryID == 0 { // 0은 유효하지 않은 ID로 간주
+		response.Error(w, http.StatusBadRequest, apperror.ErrDiaryNotFound.Error())
+		return
+	}
+
+	diary, status, err := h.diaryService.GetDiaryByID(r.Context(), diaryID)
+	if err != nil {
+		response.Error(w, status, err.Error())
+		return
+	}
+
+	res := dto.GetDiaryByIDResponseDTO{Diary: diary}
+	response.Success(w, status, "Diary retrieved successfully", res)
+}
+
 // GetDiariesByCreatorID 함수는 주어진 생성자 ID로 일기 목록을 조회하는 HTTP 핸들러입니다.
 func (h *diaryHandler) GetDiariesByCreatorID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -43,9 +83,9 @@ func (h *diaryHandler) GetDiariesByCreatorID(w http.ResponseWriter, r *http.Requ
 	}
 
 	params := r.URL.Query()
-	diaries, err := h.diaryService.GetDiariesByCreatorID(r.Context(), userID, params)
+	diaries, status, err := h.diaryService.GetDiariesByCreatorID(r.Context(), userID, params)
 	if err != nil {
-		response.Error(w, http.StatusInternalServerError, err.Error())
+		response.Error(w, status, err.Error())
 		return
 	}
 
@@ -53,7 +93,7 @@ func (h *diaryHandler) GetDiariesByCreatorID(w http.ResponseWriter, r *http.Requ
 		Diaries: diaries,
 	}
 
-	response.Success(w, http.StatusOK, "Diary list retrieved successfully", res)
+	response.Success(w, status, "Diary list retrieved successfully", res)
 }
 
 // CreateDiary 함수는 새로운 일기를 생성하는 HTTP 핸들러입니다.
@@ -75,9 +115,9 @@ func (h *diaryHandler) CreateDiary(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	diary, err := h.diaryService.CreateDiary(r.Context(), createDiaryDTO, userID)
+	diary, status, err := h.diaryService.CreateDiary(r.Context(), createDiaryDTO, userID)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, err.Error())
+		response.Error(w, status, err.Error())
 		return
 	}
 
@@ -85,5 +125,5 @@ func (h *diaryHandler) CreateDiary(w http.ResponseWriter, r *http.Request) {
 		Diary: diary,
 	}
 
-	response.Success(w, http.StatusCreated, "Diary created successfully", res)
+	response.Success(w, status, "Diary created successfully", res)
 }

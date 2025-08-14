@@ -69,6 +69,7 @@ func RegisterDiaryRoutes(mux *http.ServeMux, diaryHandler handler.DiaryHandler) 
 
 	api_v1_diaries.HandleFunc("/list/", middleware.ChainLoggingWithAuthMiddleware(diaryHandler.GetDiariesByCreatorID)) // 일기 목록 조회
 	api_v1_diaries.HandleFunc("/create/", middleware.ChainLoggingWithAuthMiddleware(diaryHandler.CreateDiary))         // 일기 생성
+	api_v1_diaries.HandleFunc("/detail/{id}/", middleware.ChainLoggingWithAuthMiddleware(diaryHandler.GetDiaryByID))   // 일기 단건 조회
 
 	mux.Handle("/api/v1/diaries/", http.StripPrefix("/api/v1/diaries", api_v1_diaries))
 }
