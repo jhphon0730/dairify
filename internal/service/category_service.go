@@ -33,7 +33,7 @@ func NewCategoryService(categoryRepository repository.CategoryRepository) Catego
 
 // CreateCategory 함수는 새로운 카테고리를 생성합니다.
 func (s *categoryService) CreateCategory(ctx context.Context, createCategoryDTO dto.CreateCategoryDTO) (*model.Category, int, error) {
-	if err := createCategoryDTO.CheckIsValidInput(); err != nil {
+	if err := createCategoryDTO.Validate(); err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 	category := createCategoryDTO.ToModel()
@@ -56,7 +56,7 @@ func (s *categoryService) GetCategoriesByCreatorID(ctx context.Context, creatorI
 
 // UpdateCategoryName 함수는 카테고리 이름을 업데이트합니다.
 func (s *categoryService) UpdateCategoryName(ctx context.Context, updateCategoryDTO dto.UpdateCategoryDTO) (*model.Category, int, error) {
-	if err := updateCategoryDTO.CheckIsValidInput(); err != nil {
+	if err := updateCategoryDTO.Validate(); err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 

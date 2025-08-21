@@ -36,7 +36,7 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 
 // Signup 함수는 새로운 사용자를 등록합니다.
 func (s *userService) SignupUser(ctx context.Context, userSignupDTO dto.UserSignupDTO) (int64, int, error) {
-	if err := userSignupDTO.CheckIsValidInput(); err != nil {
+	if err := userSignupDTO.Validate(); err != nil {
 		return 0, http.StatusBadRequest, err
 	}
 
@@ -63,7 +63,7 @@ func (s *userService) SignupUser(ctx context.Context, userSignupDTO dto.UserSign
 
 // SigninUser 함수는 사용자를 로그인합니다.
 func (s *userService) SigninUser(ctx context.Context, userSigninDTO dto.UserSigninDTO) (string, string, int, error) {
-	if err := userSigninDTO.CheckIsValidInput(); err != nil {
+	if err := userSigninDTO.Validate(); err != nil {
 		return "", "", http.StatusBadRequest, err
 	}
 

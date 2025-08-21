@@ -44,7 +44,7 @@ func (s *diaryService) GetDiariesByCreatorID(ctx context.Context, creatorID int6
 
 // CreateDiary 함수는 새로운 일기를 생성합니다.
 func (s *diaryService) CreateDiary(ctx context.Context, diary dto.CreateDiaryDTO, creatorID int64) (*model.Diary, int, error) {
-	if err := diary.CheckIsValidInput(); err != nil {
+	if err := diary.Validate(); err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 

@@ -11,8 +11,8 @@ type CreateCategoryDTO struct {
 	CreatorID int64  `json:"creator_id"`
 }
 
-// CheckIsValidInput 함수는 카테고리 생성 입력 값을 확인해주는 함수입니다.
-func (d *CreateCategoryDTO) CheckIsValidInput() error {
+// Validate 함수는 카테고리 생성 입력 값을 확인해주는 함수입니다.
+func (d *CreateCategoryDTO) Validate() error {
 	if d.Name == "" {
 		return apperror.ErrCategoryNameRequired
 	}
@@ -48,8 +48,8 @@ type UpdateCategoryDTO struct {
 	Name      string `json:"name" binding:"required"`
 }
 
-// CheckIsValidInput 함수는 카테고리 이름 업데이트 입력 값을 확인해주는 함수입니다.
-func (d *UpdateCategoryDTO) CheckIsValidInput() error {
+// Validate 함수는 카테고리 이름 업데이트 입력 값을 확인해주는 함수입니다.
+func (d *UpdateCategoryDTO) Validate() error {
 	if d.Name == "" {
 		return apperror.ErrCategoryNameRequired
 	}

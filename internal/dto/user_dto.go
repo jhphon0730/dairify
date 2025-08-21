@@ -15,8 +15,8 @@ type UserSignupDTO struct {
 	Email    string `json:"email" binding:"required"`
 }
 
-// CheckIsValidInput 함수는 입력 값을 확인해주는 함수입니다.
-func (d *UserSignupDTO) CheckIsValidInput() error {
+// Validate 함수는 입력 값을 확인해주는 함수입니다.
+func (d *UserSignupDTO) Validate() error {
 	if strings.TrimSpace(d.Username) == "" {
 		return apperror.ErrUserSignupUserNameRequired
 	}
@@ -48,7 +48,7 @@ type UserSigninDTO struct {
 }
 
 // CheckIsValidInput 함수는 사용자 로그인 입력 값을 확인해주는 함수입니다.
-func (d *UserSigninDTO) CheckIsValidInput() error {
+func (d *UserSigninDTO) Validate() error {
 	if strings.TrimSpace(d.Username) == "" {
 		return apperror.ErrUserSigninInvalidUserName
 	}
