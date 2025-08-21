@@ -17,8 +17,8 @@
 - [x] Category - Delete Category
 - [x] Diary - Create Diary
 - [x] Diary - Get Diary List
-- [ ] Diary - Get Diary Detail
-- [ ] Diary - Update Diary
+- [x] Diary - Get Diary Detail
+- [x] Diary - Update Diary
 - [ ] Diary - Delete Diary
 
 ## Frontend
