@@ -19,6 +19,6 @@
 - [x] Diary - Get Diary List
 - [x] Diary - Get Diary Detail
 - [x] Diary - Update Diary
-- [ ] Diary - Delete Diary
+- [x] Diary - Delete Diary
 
 ## Frontend
