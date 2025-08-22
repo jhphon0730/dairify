@@ -18,6 +18,7 @@ type DiaryRepository interface {
 	GetDiariesByCreatorID(ctx context.Context, creatorID int64, params url.Values) ([]model.Diary, error)
 	CreateDiary(ctx context.Context, diary *model.Diary) error
 	DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) error
+	UpdateDiary(ctx context.Context, diary *model.Diary) error
 }
 
 // diaryRepository 구조체는 DiaryRepository 인터페이스를 구현합니다.
@@ -114,6 +115,23 @@ func (r *diaryRepository) DeleteDiary(ctx context.Context, diaryID int64, creato
 	rows, err := res.RowsAffected()
 	if err != nil {
 		return apperror.ErrDiaryDeleteInternal
+	}
+	if rows == 0 {
+		return apperror.ErrDiaryNotFound
+	}
+	return nil
+}
+
+// UpdateDiary 함수는 일기를 업데이트합니다.
+func (r *diaryRepository) UpdateDiary(ctx context.Context, diary *model.Diary) error {
+	query := "UPDATE diaries SET title = $1, content = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND is_deleted = FALSE"
+	res, err := r.db.DB.ExecContext(ctx, query, diary.Title, diary.Content, diary.ID)
+	if err != nil {
+		return apperror.ErrDiaryUpdateInternal
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return apperror.ErrDiaryUpdateInternal
 	}
 	if rows == 0 {
 		return apperror.ErrDiaryNotFound

@@ -18,6 +18,7 @@ type DiaryService interface {
 	GetDiariesByCreatorID(ctx context.Context, creatorID int64, params url.Values) ([]model.Diary, int, error)
 	CreateDiary(ctx context.Context, diary dto.CreateDiaryDTO, creatorID int64) (*model.Diary, int, error)
 	DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) (int, error)
+	UpdateDiary(ctx context.Context, updateDTO dto.UpdateDiaryDTO, diaryID int64, creatorID int64) (int, error)
 }
 
 // diaryService 구조체는 DiaryService 인터페이스를 구현합니다.
@@ -84,5 +85,35 @@ func (s *diaryService) DeleteDiary(ctx context.Context, diaryID int64, creatorID
 		}
 		return http.StatusInternalServerError, apperror.ErrDiaryDeleteInternal
 	}
+	return http.StatusOK, nil
+}
+
+func (s *diaryService) UpdateDiary(ctx context.Context, updateDTO dto.UpdateDiaryDTO, diaryID int64, creatorID int64) (int, error) {
+	if err := updateDTO.Validate(); err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	// 일기 조회를 먼저 수행하여 업데이터 하려는 다이어리가 존재하는 지 확인
+	diary := &model.Diary{ID: diaryID}
+	err := s.diaryRepository.GetDiaryByID(ctx, diary)
+	if err != nil {
+		if errors.Is(err, apperror.ErrDiaryNotFound) {
+			return http.StatusNotFound, err
+		}
+		return http.StatusInternalServerError, apperror.ErrDiaryGetInternal
+	}
+
+	// 다이어리와, 사용자의 권한을 확인합니다.
+	if diary.CreatorID != creatorID {
+		return http.StatusForbidden, apperror.ErrDiaryUpdateForbidden
+	}
+
+	diary = updateDTO.ToModel()
+	diary.ID = diaryID
+
+	if err := s.diaryRepository.UpdateDiary(ctx, diary); err != nil {
+		return http.StatusInternalServerError, apperror.ErrDiaryUpdateInternal
+	}
+
 	return http.StatusOK, nil
 }
