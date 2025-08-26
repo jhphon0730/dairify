@@ -3,6 +3,7 @@
 ## Backend
 - [x] Config Package
 - [x] Database Package
+- [ ] Settings - Open media storage ( source directory )
 - [ ] Utils - Download Images 
 - [x] Utils - JSON Response Formatter ( Error, Success )
 - [x] User - Signup
@@ -25,3 +26,20 @@
 - [ ] Diary - Fix Get Diary Detail ( Get With Images )
 
 ## Frontend
+- [ ] React Project Setup ( Vite, Typescript, TailwindCSS, Shadcn UI )
+- [ ] React Router Setup
+- [ ] Axios Setup
+- [ ] Auth Context Setup
+- [ ] Signup Page
+- [ ] Signin Page
+- [ ] User Profile Page
+- [ ] Update User Profile Page
+- [ ] Change Password Page
+- [ ] Category List Page
+- [ ] Create Category Page
+- [ ] Update Category Page
+- [ ] Diary List Page
+- [ ] Create Diary Page
+- [ ] Update Diary Page
+- [ ] Diary Detail Page ( with Images )
+- [ ] Image Upload Component
