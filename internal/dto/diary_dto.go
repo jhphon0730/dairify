@@ -79,3 +79,8 @@ func (dto *UpdateDiaryDTO) ToModel() *model.Diary {
 type UpdateDiaryResponseDTO struct {
 	Diary *model.Diary `json:"diary"`
 }
+
+// UploadDiaryImageResponseDTO 구조체는 일기 이미지 업로드 응답 DTO입니다.
+type UploadDiaryImageResponseDTO struct {
+	Images []*model.DiaryImage `json:"images"`
+}

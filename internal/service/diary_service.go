@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 
@@ -19,6 +20,7 @@ type DiaryService interface {
 	CreateDiary(ctx context.Context, diary dto.CreateDiaryDTO, creatorID int64) (*model.Diary, int, error)
 	DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) (int, error)
 	UpdateDiary(ctx context.Context, updateDTO dto.UpdateDiaryDTO, diaryID int64, creatorID int64) (int, error)
+	UploadDiaryImage(ctx context.Context, files []*multipart.FileHeader, diaryID int64, creatorID int64) ([]*model.DiaryImage, int, error)
 }
 
 // diaryService 구조체는 DiaryService 인터페이스를 구현합니다.
@@ -116,4 +118,27 @@ func (s *diaryService) UpdateDiary(ctx context.Context, updateDTO dto.UpdateDiar
 	}
 
 	return http.StatusOK, nil
+}
+
+// UploadDiaryImage 함수는 다이어리 이미지를 업로드하고 저장된 경로를 반환합니다.
+func (s *diaryService) UploadDiaryImage(ctx context.Context, files []*multipart.FileHeader, diaryID int64, creatorID int64) ([]*model.DiaryImage, int, error) {
+	diary := &model.Diary{ID: diaryID}
+	err := s.diaryRepository.GetDiaryByID(ctx, diary)
+	if err != nil {
+		if errors.Is(err, apperror.ErrDiaryNotFound) {
+			return nil, http.StatusNotFound, err
+		}
+		return nil, http.StatusInternalServerError, apperror.ErrDiaryGetInternal
+	}
+
+	// 다이어리와, 사용자의 권한을 확인합니다.
+	if diary.CreatorID != creatorID {
+		return nil, http.StatusForbidden, apperror.ErrDiaryUpdateForbidden
+	}
+
+	diaryImages, err := s.diaryRepository.UploadDiaryImage(ctx, files, diaryID)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	return diaryImages, http.StatusOK, nil
 }

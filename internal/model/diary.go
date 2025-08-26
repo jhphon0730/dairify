@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 // Diary는 일기(다이어리) 모델을 나타냅니다.
 type Diary struct {
 	ID         int64   `json:"id"`
@@ -11,4 +13,16 @@ type Diary struct {
 	UpdatedAt  string  `json:"updated_at"`
 	IsDeleted  bool    `json:"is_deleted"`
 	DeletedAt  *string `json:"deleted_at,omitempty"`
+}
+
+// DiaryImage는 일기 이미지 모델을 나타냅니다.
+type DiaryImage struct {
+	ID          int64     `json:"id"`
+	DiaryID     int64     `json:"diary_id"`
+	FilePath    string    `json:"file_path"`
+	FileName    string    `json:"file_name"`
+	ContentType string    `json:"content_type"`
+	FileSize    int64     `json:"file_size"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }

@@ -3,6 +3,7 @@
 ## Backend
 - [x] Config Package
 - [x] Database Package
+- [ ] Utils - Download Images 
 - [x] Utils - JSON Response Formatter ( Error, Success )
 - [x] User - Signup
 - [x] User - Signin ( get JWT token )
@@ -20,5 +21,7 @@
 - [x] Diary - Get Diary Detail
 - [x] Diary - Update Diary
 - [x] Diary - Delete Diary
+- [x] Diary - Upload Images
+- [ ] Diary - Fix Get Diary Detail ( Get With Images )
 
 ## Frontend

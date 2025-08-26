@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"mime/multipart"
 	"net/url"
 
 	"github.com/jhphon0730/dairify/internal/database"
@@ -19,6 +20,7 @@ type DiaryRepository interface {
 	CreateDiary(ctx context.Context, diary *model.Diary) error
 	DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) error
 	UpdateDiary(ctx context.Context, diary *model.Diary) error
+	UploadDiaryImage(ctx context.Context, file []*multipart.FileHeader, diaryID int64) ([]*model.DiaryImage, error)
 }
 
 // diaryRepository 구조체는 DiaryRepository 인터페이스를 구현합니다.
@@ -137,4 +139,37 @@ func (r *diaryRepository) UpdateDiary(ctx context.Context, diary *model.Diary) e
 		return apperror.ErrDiaryNotFound
 	}
 	return nil
+}
+
+// UploadDiaryImage 함수는 다이어리 이미지를 업로드하고 저장된 경로를 반환합니다.
+func (r *diaryRepository) UploadDiaryImage(ctx context.Context, files []*multipart.FileHeader, diaryID int64) ([]*model.DiaryImage, error) {
+	var diaryImages []*model.DiaryImage
+
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, apperror.ErrDiaryImageUploadInternal
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	query := "INSERT INTO images (diary_id, file_path, file_name, content_type, file_size) VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	for _, file := range files {
+		// 이미지 업로드를 수행하고 결과 객체를 반환받음
+		diaryImage, err := utils.UploadDiaryImage(file, diaryID)
+		if err != nil {
+			utils.RemoveDiaryImages(diaryImages)
+			return nil, err
+		}
+		// 업로드된 이미지 정보를 슬라이스에 추가
+		diaryImages = append(diaryImages, diaryImage)
+
+		// RETURNING id를 사용하므로 QueryRowContext로 id를 스캔
+		if err := tx.QueryRowContext(ctx, query, diaryID, diaryImage.FilePath, diaryImage.FileName, diaryImage.ContentType, diaryImage.FileSize).Scan(&diaryImage.ID); err != nil {
+			utils.RemoveDiaryImages(diaryImages)
+			return nil, apperror.ErrDiaryImageUploadInternal
+		}
+	}
+
+	return diaryImages, tx.Commit()
 }

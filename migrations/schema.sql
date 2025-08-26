@@ -38,3 +38,20 @@ ALTER TABLE diaries ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL;
 -- 컬럼 존재가 보장된 이후 인덱스 생성
 CREATE INDEX IF NOT EXISTS idx_diaries_is_deleted ON diaries(is_deleted);
 CREATE INDEX IF NOT EXISTS idx_diaries_is_deleted2 ON diaries(is_deleted, creator_id);
+
+-- 이미지 메타데이터 테이블 (1:N: diary -> images)
+CREATE TABLE IF NOT EXISTS "images" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "diary_id" BIGINT NOT NULL,
+  "file_path" TEXT NOT NULL,
+  "file_name" TEXT NOT NULL,
+  "content_type" TEXT NOT NULL,
+  "file_size" BIGINT NOT NULL,
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT "fk_images_diary"
+    FOREIGN KEY ("diary_id") REFERENCES "diaries"("id")
+    ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "idx_images_diary_id" ON "images"("diary_id");
