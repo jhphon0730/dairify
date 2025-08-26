@@ -1,10 +1,11 @@
 # TODO-LIST
 
 ## Backend
+
 - [x] Config Package
 - [x] Database Package
 - [ ] Settings - Open media storage ( source directory )
-- [ ] Utils - Download Images 
+- [ ] Utils - Download Images
 - [x] Utils - JSON Response Formatter ( Error, Success )
 - [x] User - Signup
 - [x] User - Signin ( get JWT token )
@@ -26,6 +27,7 @@
 - [ ] Diary - Fix Get Diary Detail ( Get With Images )
 
 ## Frontend
+
 - [ ] React Project Setup ( Vite, Typescript, TailwindCSS, Shadcn UI )
 - [ ] React Router Setup
 - [ ] Axios Setup
