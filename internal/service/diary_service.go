@@ -73,6 +73,17 @@ func (s *diaryService) GetDiaryByID(ctx context.Context, diaryID int64) (*model.
 		return nil, http.StatusInternalServerError, apperror.ErrDiaryGetInternal
 	}
 
+	// 일기에 해당하는 이미지들도 함께 조회
+	images, err := s.diaryRepository.GetImagesByDiaryID(ctx, diary.ID)
+	if err != nil {
+		diary.Images = nil
+		if errors.Is(err, apperror.ErrDiaryImageNotFound) {
+			return diary, http.StatusOK, nil
+		}
+		return nil, http.StatusInternalServerError, apperror.ErrDiaryGetInternal
+	}
+	diary.Images = images
+
 	return diary, http.StatusOK, nil
 }
 

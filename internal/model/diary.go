@@ -13,6 +13,8 @@ type Diary struct {
 	UpdatedAt  string  `json:"updated_at"`
 	IsDeleted  bool    `json:"is_deleted"`
 	DeletedAt  *string `json:"deleted_at,omitempty"`
+
+	Images []*DiaryImage `json:"images,omitempty"` // 일기와 연관된 이미지들 ( 있을 경우 )
 }
 
 // DiaryImage는 일기 이미지 모델을 나타냅니다.

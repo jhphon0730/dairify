@@ -21,6 +21,7 @@ type DiaryRepository interface {
 	DeleteDiary(ctx context.Context, diaryID int64, creatorID int64) error
 	UpdateDiary(ctx context.Context, diary *model.Diary) error
 	UploadDiaryImage(ctx context.Context, file []*multipart.FileHeader, diaryID int64) ([]*model.DiaryImage, error)
+	GetImagesByDiaryID(ctx context.Context, diaryID int64) ([]*model.DiaryImage, error)
 }
 
 // diaryRepository 구조체는 DiaryRepository 인터페이스를 구현합니다.
@@ -173,3 +174,28 @@ func (r *diaryRepository) UploadDiaryImage(ctx context.Context, files []*multipa
 
 	return diaryImages, tx.Commit()
 }
+
+// GetImagesByDiaryID 함수는 다이어리 ID로 이미지 목록을 조회합니다.
+func (r *diaryRepository) GetImagesByDiaryID(ctx context.Context, diaryID int64) ([]*model.DiaryImage, error) {
+	var diaryImages []*model.DiaryImage
+	query := "SELECT id, diary_id, file_path, file_name, content_type, file_size, created_at FROM images WHERE diary_id = $1"
+	rows, err := r.db.DB.QueryContext(ctx, query, diaryID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, apperror.ErrDiaryImageNotFound
+		}
+		return nil, apperror.ErrDiaryImageGetInternal
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var diaryImage model.DiaryImage
+		if err := rows.Scan(&diaryImage.ID, &diaryImage.DiaryID, &diaryImage.FilePath, &diaryImage.FileName, &diaryImage.ContentType, &diaryImage.FileSize, &diaryImage.CreatedAt); err != nil {
+			return nil, apperror.ErrDiaryImageGetInternal
+		}
+		diaryImages = append(diaryImages, &diaryImage)
+	}
+
+	return diaryImages, nil
+}
+
