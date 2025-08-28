@@ -1,7 +1,8 @@
 // Response는 API 응답의 형식을 정의합니다.
 export interface Response<T> {
 	data: T
-	error: string | null
+  message?: string
+	error?: string
 }
 
 // FetchOptions는 API 요청의 형식을 정의합니다.
