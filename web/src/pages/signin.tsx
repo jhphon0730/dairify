@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
+import { tokenManager } from "@/api/api"
 import { SignIn } from "@/api/auth"
 
 // 로그인 페이지 컴포넌트
@@ -50,6 +51,9 @@ const SignInPage = () => {
         icon: "success",
         confirmButtonText: "확인",
       }).then(() => {
+        tokenManager.setToken(response.data.access_token)
+        return
+
         navigate("/")
       })
     } catch (err) {
