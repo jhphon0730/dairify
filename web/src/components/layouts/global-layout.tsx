@@ -1,13 +1,9 @@
-import { type ReactNode, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useEffect } from "react"
+import { Outlet, useNavigate } from "react-router-dom"
 
 import { IsLoggedIn } from "@/api/api"
 
-interface GlobalLayoutProps {
-  children: ReactNode
-}
-
-const GlobalLayout = ({children}: GlobalLayoutProps) => {
+const GlobalLayout = () => {
   const navigate = useNavigate()
 
   // useEffect로 URL이 바뀔 때 마다 확인
@@ -24,7 +20,9 @@ const GlobalLayout = ({children}: GlobalLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="container mx-auto px-4 py-8">
+        <Outlet />
+      </main>
     </div>
   )
 }
