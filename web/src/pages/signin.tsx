@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import Swal from "sweetalert2" // SweetAlert2 import 추가
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 import { SignIn } from "@/api/auth"
 
+// 로그인 페이지 컴포넌트
 const SignInPage = () => {
   const navigate = useNavigate()
 
@@ -18,6 +20,7 @@ const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
+  // 입력 변경 처리
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
       ...prev,
@@ -25,7 +28,8 @@ const SignInPage = () => {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 폼 제출 처리
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
@@ -38,16 +42,21 @@ const SignInPage = () => {
 
       if (response.error) {
         setError(response.error)
-        return
+      } else if (response.data) {
+        Swal.fire({
+          title: "로그인 성공!",
+          text: "환영합니다! 메인 페이지로 이동합니다.",
+          icon: "success",
+          confirmButtonText: "확인",
+        }).then(() => {
+          navigate("/")
+        })
       }
-
-      navigate("/")
-      return
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
       } else {
-        setError("네트워크 오류가 발생했습니다. 다시 시도해주세요.")
+      setError("네트워크 오류가 발생했습니다. 다시 시도해주세요.")
       }
     } finally {
       setIsLoading(false)
@@ -104,4 +113,4 @@ const SignInPage = () => {
   )
 }
 
-export default SignInPage;
+export default SignInPage
