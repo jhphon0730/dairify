@@ -74,7 +74,7 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Service 함수 호출
-	accessToken, refreshToken, status, err := h.userService.SigninUser(r.Context(), inp)
+	accessToken, refreshToken, user, status, err := h.userService.SigninUser(r.Context(), inp)
 	if err != nil {
 		response.Error(w, status, err.Error())
 		return
@@ -83,6 +83,7 @@ func (h *userHandler) SigninUser(w http.ResponseWriter, r *http.Request) {
 	signinResponse := dto.UserSigninResponseDTO{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
+		User:         user,
 	}
 	response.Success(w, status, "User signed in successfully", signinResponse)
 }

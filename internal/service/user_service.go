@@ -17,7 +17,7 @@ import (
 // UserService 인터페이스는 사용자 관련 서비스의 메서드를 정의합니다.
 type UserService interface {
 	SignupUser(ctx context.Context, userSignupDTO dto.UserSignupDTO) (int64, int, error)
-	SigninUser(ctx context.Context, userSigninDTO dto.UserSigninDTO) (string, string, int, error)
+	SigninUser(ctx context.Context, userSigninDTO dto.UserSigninDTO) (string, string, *model.User, int, error)
 	SignoutUser(ctx context.Context, userID int64) (int, error)
 	Profile(ctx context.Context, userID int64) (*model.User, int, error)
 }
@@ -62,46 +62,46 @@ func (s *userService) SignupUser(ctx context.Context, userSignupDTO dto.UserSign
 }
 
 // SigninUser 함수는 사용자를 로그인합니다.
-func (s *userService) SigninUser(ctx context.Context, userSigninDTO dto.UserSigninDTO) (string, string, int, error) {
+func (s *userService) SigninUser(ctx context.Context, userSigninDTO dto.UserSigninDTO) (string, string, *model.User, int, error) {
 	if err := userSigninDTO.Validate(); err != nil {
-		return "", "", http.StatusBadRequest, err
+		return "", "", nil, http.StatusBadRequest, err
 	}
 
 	user, err := s.userRepository.FindUserByUsername(ctx, userSigninDTO.Username)
 	if errors.Is(err, apperror.ErrUserNotFound) {
-		return "", "", http.StatusUnauthorized, apperror.ErrUserSigninInvalidUserName
+		return "", "", nil, http.StatusUnauthorized, apperror.ErrUserSigninInvalidUserName
 	}
 	if err != nil {
-		return "", "", http.StatusInternalServerError, err
+		return "", "", nil, http.StatusInternalServerError, err
 	}
 
 	// 비밀번호 검증
 	if err := utils.CompareHashAndPassword(user.Password, userSigninDTO.Password); err != nil {
-		return "", "", http.StatusUnauthorized, apperror.ErrUserSigninInvalidPassword
+		return "", "", nil, http.StatusUnauthorized, apperror.ErrUserSigninInvalidPassword
 	}
 
 	// JWT 토큰 생성 ( access, refresh )
 	accessToken, err := auth.GenerateJWTToken(user.ID)
 	if err != nil {
-		return "", "", http.StatusInternalServerError, err
+		return "", "", nil, http.StatusInternalServerError, err
 	}
 
 	refreshToken, err := auth.GenerateRefreshToken(user.ID)
 	if err != nil {
-		return "", "", http.StatusInternalServerError, err
+		return "", "", nil, http.StatusInternalServerError, err
 	}
 
 	// AccessToken을 Redis에 저장
 	userRedisClient, err := redis.GetUserRedis(ctx)
 	if err != nil {
-		return "", "", http.StatusInternalServerError, apperror.ErrInternalServerError
+		return "", "", nil, http.StatusInternalServerError, apperror.ErrInternalServerError
 	}
 
 	if err := userRedisClient.SetUserToken(ctx, user.ID, accessToken); err != nil {
-		return "", "", http.StatusInternalServerError, apperror.ErrInternalServerError
+		return "", "", nil, http.StatusInternalServerError, apperror.ErrInternalServerError
 	}
 
-	return accessToken, refreshToken, http.StatusOK, nil
+	return accessToken, refreshToken, user, http.StatusOK, nil
 }
 
 // SignoutUser 함수는 사용자를 로그아웃합니다.
