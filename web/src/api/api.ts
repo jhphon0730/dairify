@@ -109,5 +109,5 @@ export const FetchWithAuthFormData = async (url: string, options: FetchOptions =
 const handleTokenExpiration = () => {
   // logout()
   tokenManager.removeToken()
-	window.location.replace("/signin")
+	window.location.replace("/auth/signin")
 }
