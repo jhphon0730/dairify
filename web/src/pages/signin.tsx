@@ -38,9 +38,11 @@ const SignInPage = () => {
 
       if (response.error) {
         setError(response.error)
-      } else if (response.data) {
-        navigate("/")
+        return
       }
+
+      navigate("/")
+      return
     } catch (err) {
       setError("네트워크 오류가 발생했습니다. 다시 시도해주세요.")
     } finally {
