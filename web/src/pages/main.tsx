@@ -11,13 +11,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Plus, Calendar, BookOpen } from "lucide-react"
+import { Search, Plus, Calendar, BookOpen, SearchX } from "lucide-react"
 
 const MainPage = () => {
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [searchTitle, setSearchTitle] = useState<string>("")
   const [searchCategory, setSearchCategory] = useState<string | undefined>(undefined)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [hasSearched, setHasSearched] = useState<boolean>(false)
 
   useEffect(() => {
     handleGetDiaries("", undefined)
@@ -43,18 +44,23 @@ const MainPage = () => {
       return
     }
 
-    setDiaries(() => res.data.diaries)
+    if (res.data) {
+      setDiaries(() => res.data.diaries)
+    }
+
     setIsLoading(() => false)
   }
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setHasSearched(true)
     handleGetDiaries(searchTitle, searchCategory ? Number.parseInt(searchCategory) : undefined)
   }
 
   const handleResetSearch = () => {
     setSearchTitle("")
     setSearchCategory(undefined)
+    setHasSearched(false)
     handleGetDiaries("", undefined)
   }
 
@@ -113,12 +119,22 @@ const MainPage = () => {
 
       {/* Diary List */}
       <div className="space-y-4">
-        {diaries && diaries.length === 0 && !isLoading ? (
+        {!diaries && !isLoading ? (
           <Card className="bg-white border-gray-100">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
-              <p className="text-gray-600 mb-2">아직 작성된 일기가 없습니다</p>
-              <p className="text-sm text-gray-500">첫 번째 일기를 작성해보세요!</p>
+              {hasSearched ? (
+                <>
+                  <SearchX className="h-12 w-12 text-gray-300 mb-4" />
+                  <p className="text-gray-600 mb-2">검색 결과가 없습니다</p>
+                  <p className="text-sm text-gray-500">다른 키워드로 검색해보세요</p>
+                </>
+              ) : (
+                <>
+                  <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
+                  <p className="text-gray-600 mb-2">아직 작성된 일기가 없습니다</p>
+                  <p className="text-sm text-gray-500">첫 번째 일기를 작성해보세요!</p>
+                </>
+              )}
             </CardContent>
           </Card>
         ) : (
