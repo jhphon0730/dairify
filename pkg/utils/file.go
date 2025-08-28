@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"errors"
 
 	"github.com/jhphon0730/dairify/pkg/apperror"
 )
@@ -34,9 +35,21 @@ func saveDiaryImageToDisk(dir, prefix, fileName, contentType string, content []b
 	return fullPath, nil
 }
 
+// removeFile 함수는 지정한 경로의 파일을 삭제합니다.
 func removeFile(path string) error {
 	if err := os.Remove(path); err != nil {
 		return err
 	}
 	return nil
+}
+
+
+// ReadFile 함수는 지정한 경로의 파일을 읽어 바이트 슬라이스로 반환합니다.
+func ReadFile(path string) ([]byte, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, errors.New("파일을 읽는 데 실패했습니다")
+	}
+
+	return data, nil
 }

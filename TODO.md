@@ -5,7 +5,6 @@
 - [x] Config Package
 - [x] Database Package
 - [x] Settings - Open media storage ( source directory )
-- [ ] Utils - Download Images
 - [x] Utils - JSON Response Formatter ( Error, Success )
 - [x] User - Signup
 - [x] User - Signin ( get JWT token )
