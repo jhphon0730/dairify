@@ -5,27 +5,55 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 
-import type { Diary } from "@/type/diary"
-import { GetDiaries } from "@/api/diary"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Search, Plus, Calendar, BookOpen, SearchX } from "lucide-react"
 
+import type { Diary } from "@/type/diary"
+import type { Category } from "@/type/category"
+import { GetDiaries } from "@/api/diary"
+import { GetCategories } from "@/api/category"
+
+
 const MainPage = () => {
   const [diaries, setDiaries] = useState<Diary[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const [searchTitle, setSearchTitle] = useState<string>("")
   const [searchCategory, setSearchCategory] = useState<string | undefined>(undefined)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  
   const [hasSearched, setHasSearched] = useState<boolean>(false)
 
   useEffect(() => {
     handleGetDiaries("", undefined)
+    handleGetCategories()
   }, [])
 
   const handleChangeSearchTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTitle(() => event.target.value)
+  }
+
+  const handleChangeSearchCategory = (value: string) => {
+    setSearchCategory(() => value === "all" ? undefined : value)
+  }
+
+  const handleGetCategories = async () => {
+    const res = await GetCategories()
+    if (res.error) {
+      Swal.fire({
+        title: "카테고리 불러오기 실패",
+        text: res.error,
+      })
+      return
+    }
+
+    if (res.data) {
+      setCategories(() => res.data.categories)
+    }
   }
 
   const handleGetDiaries = async (searchT: string, searchC: number | undefined) => {
@@ -91,6 +119,22 @@ const MainPage = () => {
             className="pl-10 bg-white border-gray-200 focus:border-gray-400"
           />
         </div>
+
+        <Select value={searchCategory || "all"} onValueChange={handleChangeSearchCategory}>
+          <SelectTrigger className="bg-white border-gray-200 focus:border-gray-400">
+            <SelectValue placeholder="카테고리 선택" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">전체 카테고리</SelectItem>
+            {categories && categories.map((category) => (
+              <SelectItem key={category.id} value={category.id.toString()}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+
         <div className="flex gap-2">
           <Button type="submit" className="flex-1 bg-gray-500 hover:bg-gray-600 text-white" disabled={isLoading}>
             {isLoading ? "검색 중..." : "검색"}
