@@ -9,10 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 import { tokenManager } from "@/api/api"
 import { SignIn } from "@/api/auth"
+import { useAuthStore } from "@/store/auth_store"
 
 // 로그인 페이지 컴포넌트
 const SignInPage = () => {
   const navigate = useNavigate()
+  const { setUser } = useAuthStore((state) => state)
 
   const [formData, setFormData] = useState({
     username: "",
@@ -52,6 +54,7 @@ const SignInPage = () => {
         confirmButtonText: "확인",
       }).then(() => {
         tokenManager.setToken(response.data.access_token)
+        setUser(response.data.user)
 
         navigate("/")
       })

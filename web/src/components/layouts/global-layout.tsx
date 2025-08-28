@@ -1,16 +1,26 @@
 import { useEffect } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
+import Swal from "sweetalert2"
 
 import { IsLoggedIn } from "@/api/api"
+import { useAuthStore } from "@/store/auth_store"
 
 const GlobalLayout = () => {
   const navigate = useNavigate()
+  const { clearUser, user } = useAuthStore((state) => state)
 
   // useEffect로 URL이 바뀔 때 마다 확인
   useEffect(() => {
     console.info("Checking login status...")
     const checkLoginStatus = () => {
-      if (!IsLoggedIn()) {
+      if (!IsLoggedIn() || !user) {
+        Swal.fire({
+          title: "로그인 필요",
+          text: "로그인이 필요합니다.",
+          icon: "warning",
+          confirmButtonText: "확인",
+        })
+        clearUser()
         navigate("/auth/signin")
       }
     }
