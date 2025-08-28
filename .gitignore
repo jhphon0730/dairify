@@ -3,3 +3,16 @@
 
 # 업로드 파일 관리
 /media
+
+# React
+/node_modules
+/build
+/dist
+/.next
+/.vercel
+/out
+/.expo
+.expo-shared
+/web-build
+/ios-build
+
