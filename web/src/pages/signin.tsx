@@ -103,7 +103,7 @@ const SignInPage = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             계정이 없으신가요?
-            <Link to="/auth/signup" className="text-blue-600 hover:underline">
+            <Link to="/auth/signup" className="text-blue-600 ms-1 hover:underline">
               회원가입
             </Link>
           </p>

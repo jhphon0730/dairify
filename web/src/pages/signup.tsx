@@ -131,8 +131,8 @@ const SignUpPage = () => {
         </form>
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            이미 계정이 있으신가요?{" "}
-            <Link to="/auth/signin" className="text-blue-600 hover:underline">
+            이미 계정이 있으신가요?
+            <Link to="/auth/signin" className="text-blue-600 ms-1 hover:underline">
               로그인
             </Link>
           </p>
