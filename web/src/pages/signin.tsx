@@ -42,22 +42,22 @@ const SignInPage = () => {
 
       if (response.error) {
         setError(response.error)
-      } else if (response.data) {
-        Swal.fire({
-          title: "로그인 성공!",
-          text: "환영합니다! 메인 페이지로 이동합니다.",
-          icon: "success",
-          confirmButtonText: "확인",
-        }).then(() => {
-          navigate("/")
-        })
+        return
       }
+      Swal.fire({
+        title: "로그인 성공!",
+        text: "환영합니다! 메인 페이지로 이동합니다.",
+        icon: "success",
+        confirmButtonText: "확인",
+      }).then(() => {
+        navigate("/")
+      })
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
-      } else {
-      setError("네트워크 오류가 발생했습니다. 다시 시도해주세요.")
+        return
       }
+      setError("네트워크 오류가 발생했습니다. 다시 시도해주세요.")
     } finally {
       setIsLoading(false)
     }
