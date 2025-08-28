@@ -29,6 +29,12 @@ export const tokenManager = {
   },
 }
 
+// 로그인 상태인지 Manager로 확인하는 함수
+export const IsLoggedIn = (): boolean => {
+  const token = tokenManager.getToken()
+  return token !== null && !tokenManager.isTokenExpired(token)
+}
+
 // JWT 없이 요청
 export const FetchWithOutAuth = async (url: string, options: FetchOptions = {}) => {
 	const mergeOptions = {
