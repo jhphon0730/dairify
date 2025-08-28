@@ -52,7 +52,6 @@ const SignInPage = () => {
         confirmButtonText: "확인",
       }).then(() => {
         tokenManager.setToken(response.data.access_token)
-        return
 
         navigate("/")
       })

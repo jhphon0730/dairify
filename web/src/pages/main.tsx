@@ -78,13 +78,7 @@ const MainPage = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 min-h-screen bg-background">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-gray-600">Dairify</h1>
-        <p className="text-muted-foreground">나만의 소중한 일기장</p>
-      </div>
-
+    <div className="max-w-md mx-auto p-4 space-y-3 min-h-screen bg-background">
       {/* Search Form */}
       <form onSubmit={handleSearchSubmit} className="space-y-4">
         <div className="relative">
@@ -159,8 +153,8 @@ const MainPage = () => {
                 <CardDescription className="text-gray-600 text-pretty">
                   {truncateContent(diary.content)}
                 </CardDescription>
-                <Button variant="ghost" size="sm" className="mt-3 p-0 h-auto text-gray-600 hover:text-gray-700">
-                  자세히 보기 →
+                <Button variant="ghost" size="sm" className="mt-3 p-0 h-auto text-gray-600 hover:text-gray-700 underline">
+                  자세히 보기
                 </Button>
               </CardContent>
             </Card>

@@ -20,7 +20,12 @@ const GlobalLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <header className="text-center space-y-2 mx-0 my-4">
+        <h1 className="text-3xl font-bold text-gray-600">Dairify</h1>
+        <p className="text-muted-foreground">나만의 소중한 일기장</p>
+      </header>
+      <main className="container mx-auto p-2">
         <Outlet />
       </main>
     </div>
