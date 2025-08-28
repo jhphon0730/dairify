@@ -10,6 +10,8 @@ import (
 
 // Server 인터페이스는 서버의 기본 동작을 정의합니다.
 type Server interface {
+	settingMediaDir()
+
 	RunServer() error
 	Shutdown(ctx context.Context) error
 }
@@ -35,8 +37,16 @@ func NewServer(PORT string, db *database.DB) Server {
 	}
 }
 
+// settingMediaDir는 미디어 디렉토리를 설정합니다.
+func (s *server) settingMediaDir() {
+	fs := http.FileServer(http.Dir("./media"))
+	s.httpServer.Handler.(*http.ServeMux).Handle("/media/", http.StripPrefix("/media/", fs))
+}
+
 // RunServer는 서버를 시작합니다.
 func (s *server) RunServer() error {
+	s.settingMediaDir()
+
 	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return err
 	}

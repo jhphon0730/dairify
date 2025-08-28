@@ -4,7 +4,7 @@
 
 - [x] Config Package
 - [x] Database Package
-- [ ] Settings - Open media storage ( source directory )
+- [x] Settings - Open media storage ( source directory )
 - [ ] Utils - Download Images
 - [x] Utils - JSON Response Formatter ( Error, Success )
 - [x] User - Signup
@@ -24,7 +24,7 @@
 - [x] Diary - Update Diary
 - [x] Diary - Delete Diary
 - [x] Diary - Upload Images
-- [ ] Diary - Fix Get Diary Detail ( Get With Images )
+- [x] Diary - Fix Get Diary Detail ( Get With Images )
 
 ## Frontend
 
