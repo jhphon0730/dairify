@@ -5,27 +5,23 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 
+import type { Diary } from "@/type/diary"
+import type { Category } from "@/type/category"
+import { GetDiaries } from "@/api/diary"
+import { GetCategories } from "@/api/category"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Plus, Calendar, BookOpen, SearchX } from "lucide-react"
-
-import type { Diary } from "@/type/diary"
-import type { Category } from "@/type/category"
-import { GetDiaries } from "@/api/diary"
-import { GetCategories } from "@/api/category"
-
+import { Search, Calendar, BookOpen, SearchX, PenTool } from "lucide-react"
 
 const MainPage = () => {
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
   const [searchTitle, setSearchTitle] = useState<string>("")
   const [searchCategory, setSearchCategory] = useState<string | undefined>(undefined)
-  
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [hasSearched, setHasSearched] = useState<boolean>(false)
 
   useEffect(() => {
@@ -33,16 +29,9 @@ const MainPage = () => {
     handleGetCategories()
   }, [])
 
-  const handleChangeSearchTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTitle(() => event.target.value)
-  }
-
-  const handleChangeSearchCategory = (value: string) => {
-    setSearchCategory(() => value === "all" ? undefined : value)
-  }
-
   const handleGetCategories = async () => {
     const res = await GetCategories()
+
     if (res.error) {
       Swal.fire({
         title: "카테고리 불러오기 실패",
@@ -51,9 +40,15 @@ const MainPage = () => {
       return
     }
 
-    if (res.data) {
-      setCategories(() => res.data.categories)
-    }
+    setCategories(() => res.data.categories)
+  }
+
+  const handleChangeSearchTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTitle(() => event.target.value)
+  }
+
+  const handleChangeSearchCategory = (value: string) => {
+    setSearchCategory(() => (value === "all" ? undefined : value))
   }
 
   const handleGetDiaries = async (searchT: string, searchC: number | undefined) => {
@@ -72,10 +67,7 @@ const MainPage = () => {
       return
     }
 
-    if (res.data) {
-      setDiaries(() => res.data.diaries)
-    }
-
+    setDiaries(() => res.data.diaries)
     setIsLoading(() => false)
   }
 
@@ -105,28 +97,32 @@ const MainPage = () => {
     return content.length > maxLength ? content.substring(0, maxLength) + "..." : content
   }
 
+  const getCategoryName = (categoryId: number) => {
+    const category = categories.find((cat) => cat.id === categoryId)
+    return category ? category.name : `카테고리 ${categoryId}`
+  }
+
   return (
-    <div className="max-w-lg mx-auto p-4 space-y-3 min-h-screen bg-background">
-      {/* Search Form */}
+    <div className="max-w-md mx-auto p-4 space-y-6 min-h-screen bg-background">
       <form onSubmit={handleSearchSubmit} className="space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
           <Input
             type="text"
             placeholder="일기 제목으로 검색..."
             value={searchTitle}
             onChange={handleChangeSearchTitle}
-            className="pl-10 bg-white border-gray-200 focus:border-gray-400"
+            className="pl-11 h-12 bg-input border-border focus:border-primary/50 focus:ring-ring shadow-sm rounded-xl"
           />
         </div>
 
         <Select value={searchCategory || "all"} onValueChange={handleChangeSearchCategory}>
-          <SelectTrigger className="bg-white border-gray-200 focus:border-gray-400 w-full">
+          <SelectTrigger className="h-12 bg-input border-border focus:border-primary/50 focus:ring-ring shadow-sm rounded-xl w-full">
             <SelectValue placeholder="카테고리 선택" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">전체 카테고리</SelectItem>
-            {categories && categories.map((category) => (
+            {categories.map((category) => (
               <SelectItem key={category.id} value={category.id.toString()}>
                 {category.name}
               </SelectItem>
@@ -134,70 +130,81 @@ const MainPage = () => {
           </SelectContent>
         </Select>
 
-
-        <div className="flex gap-2">
-          <Button type="submit" className="flex-1 bg-gray-500 hover:bg-gray-600 text-white" disabled={isLoading}>
+        <div className="flex gap-3">
+          <Button
+            type="submit"
+            className="flex-1 h-12 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-200 rounded-xl font-medium"
+            disabled={isLoading}
+          >
             {isLoading ? "검색 중..." : "검색"}
           </Button>
           <Button
             type="button"
             variant="outline"
             onClick={handleResetSearch}
-            className="border-gray-200 text-gray-600 hover:bg-gray-50 bg-transparent"
+            className="h-12 px-6 border-border hover:bg-muted hover:border-primary/30 transition-all duration-200 rounded-xl bg-transparent"
           >
             초기화
           </Button>
         </div>
       </form>
 
-      {/* Add New Diary Button */}
-      <Button className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3" size="lg">
-        <Plus className="mr-2 h-5 w-5" />새 일기 작성
+      <Button
+        className="w-full h-14 bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-md hover:shadow-lg transition-all duration-200 rounded-xl font-semibold text-lg"
+        size="lg"
+      >
+        새 일기 작성
       </Button>
 
-      {/* Diary List */}
       <div className="space-y-4">
-        {!diaries && !isLoading ? (
-          <Card className="bg-white border-gray-100">
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+        {diaries && diaries.length === 0 && !isLoading ? (
+          <Card className="bg-card border-border shadow-sm rounded-xl">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
               {hasSearched ? (
                 <>
-                  <SearchX className="h-12 w-12 text-gray-300 mb-4" />
-                  <p className="text-gray-600 mb-2">검색 결과가 없습니다</p>
-                  <p className="text-sm text-gray-500">다른 키워드로 검색해보세요</p>
+                  <SearchX className="h-16 w-16 text-muted-foreground/60 mb-6" />
+                  <p className="text-foreground text-lg font-medium mb-2">검색 결과가 없습니다</p>
+                  <p className="text-muted-foreground">다른 키워드로 검색해보세요</p>
                 </>
               ) : (
                 <>
-                  <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
-                  <p className="text-gray-600 mb-2">아직 작성된 일기가 없습니다</p>
-                  <p className="text-sm text-gray-500">첫 번째 일기를 작성해보세요!</p>
+                  <BookOpen className="h-16 w-16 text-muted-foreground/60 mb-6" />
+                  <p className="text-foreground text-lg font-medium mb-2">아직 작성된 일기가 없습니다</p>
+                  <p className="text-muted-foreground">첫 번째 일기를 작성해보세요!</p>
                 </>
               )}
             </CardContent>
           </Card>
         ) : (
-          diaries && diaries.map((diary) => (
+          diaries &&
+          diaries.map((diary) => (
             <Card
               key={diary.id}
-              className="bg-white border-gray-100 hover:shadow-md transition-shadow cursor-pointer hover:border-gray-200"
+              className="bg-card border-border hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer rounded-xl group"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg text-gray-800 text-balance">{diary.title}</CardTitle>
-                  <Badge variant="secondary" className="ml-2 shrink-0 bg-gray-100 text-gray-700">
-                    카테고리 {diary.category_id}
+                  <CardTitle className="text-xl text-card-foreground text-balance group-hover:text-primary transition-colors duration-200">
+                    {diary.title}
+                  </CardTitle>
+                  <Badge className="ml-2 shrink-0 bg-secondary/10 text-secondary border-secondary/20 rounded-lg px-3 py-1">
+                    {getCategoryName(diary.category_id)}
                   </Badge>
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Calendar className="mr-1 h-4 w-4" />
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="mr-2 h-4 w-4" />
                   {formatDate(diary.created_at)}
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <CardDescription className="text-gray-600 text-pretty">
+                <CardDescription className="text-card-foreground/80 text-pretty leading-relaxed mb-4">
                   {truncateContent(diary.content)}
                 </CardDescription>
-                <Button variant="ghost" size="sm" className="mt-3 p-0 h-auto text-gray-600 hover:text-gray-700 underline">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-0 h-auto text-primary hover:text-primary/80 font-medium group-hover:translate-x-1 transition-all duration-200"
+                >
                   자세히 보기
                 </Button>
               </CardContent>
