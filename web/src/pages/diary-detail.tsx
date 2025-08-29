@@ -7,7 +7,8 @@ import Swal from "sweetalert2"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, ChevronLeft, Image as ImageIcon, Trash2, Pencil } from "lucide-react"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { Calendar, ChevronLeft, Trash2, Pencil } from "lucide-react"
 
 import type { DiaryDetail } from "@/type/diary"
 import type { Category } from "@/type/category"
@@ -143,40 +144,44 @@ const DiaryDetailPage = () => {
         {!isLoading && diary && (
           <Card className="bg-white/95 border border-border/60 rounded-2xl overflow-hidden">
             <CardContent className="p-5 space-y-5">
-              {/* 제목 및 메타 */}
-              <div className="space-y-2">
-                <div className="flex items-start justify-between gap-3">
-                  <h1 className="text-xl font-bold leading-tight">{diary.title}</h1>
-                  <Badge className="shrink-0 bg-primary/10 text-primary border border-primary/20 rounded-full px-3 py-1.5 text-xs font-semibold">
-                    {getCategoryName(diary.category_id ?? null)}
-                  </Badge>
-                </div>
-                <div className="flex items-center text-sm text-muted-foreground/80">
-                  <Calendar className="mr-2 h-4 w-4 text-primary/70" />
-                  <span className="font-medium">{formatDate(diary.created_at)}</span>
-                  <span className="mx-2">·</span>
-                  <span className="text-xs">{diary.content.length}자</span>
+              {/* 상단 중앙 정렬 */}
+              <h1 className="text-2xl font-bold text-center leading-snug">
+                {diary.title}
+              </h1>
+
+              {/* 제목 우측 밑(작게), 모바일에서는 중앙 제목 아래 우측 정렬 */}
+              <div className="flex justify-center">
+                <div className="text-center">
+                  <div className="flex items-center flex-col gap-2">
+                    <Badge className="bg-primary/10 text-primary border border-primary/20 rounded-full px-3 py-1.5 text-xs font-semibold">
+                      {getCategoryName(diary.category_id ?? null)}
+                    </Badge>
+                    <div className="flex items-center text-sm text-muted-foreground/80">
+                      <Calendar className="mr-1.5 h-4 w-4 text-primary/70" />
+                      <span className="font-medium">{formatDate(diary.created_at)}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* 이미지 그리드 */}
+              {/* 이미지 슬라이더 */}
               {diary.images && diary.images.length > 0 && (
-                <div>
-                  <div className="mb-2 flex items-center gap-2 text-muted-foreground/80 text-sm">
-                    <ImageIcon className="h-4 w-4" />
-                    <span>이미지 {diary.images.length}장</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {diary.images.map((img) => (
-                      <img
-                        key={img.id}
-                        src={resolveImageUrl(img.file_path)}
-                        alt={img.file_name}
-                        className="w-full h-24 object-cover rounded-lg border border-border/50"
-                        loading="lazy"
-                      />
-                    ))}
-                  </div>
+                <div className="relative flex items-center justify-center">
+                  <Carousel className="rounded-xl w-full max-w-4/6">
+                    <CarouselContent>
+                      {diary.images.map((img) => (
+                        <CarouselItem key={img.id}>
+                          <img
+                            src={resolveImageUrl(img.file_path)}
+                            alt={img.file_name}
+                            className="w-full aspect-[4/3] object-cover"
+                          />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </Carousel>
                 </div>
               )}
 

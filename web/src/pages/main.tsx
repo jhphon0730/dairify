@@ -249,6 +249,8 @@ const MainPage = () => {
               key={diary.id}
               className="bg-white/95 border border-border/60 hover:border-primary/30 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer rounded-2xl group overflow-hidden relative"
               onClick={() => goToDetail(diary.id)}
+              role="button"
+              aria-label={`${diary.title} 상세 보기`}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
