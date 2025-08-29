@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 
 import type { Diary } from "@/type/diary"
@@ -21,6 +22,7 @@ const DATE_LOCALE = "ko-KR"
 const SKELETON_COUNT = 4
 
 const MainPage = () => {
+  const navigate = useNavigate()
   const [diaries, setDiaries] = useState<Diary[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [searchTitle, setSearchTitle] = useState<string>("")
@@ -133,6 +135,11 @@ const MainPage = () => {
     </Card>
   )
 
+  // 상세 페이지로 이동
+  const goToDetail = (id: number) => {
+    navigate(`/diary/${id}`)
+  }
+
   return (
     <div className="relative mx-auto max-w-md min-h-screen bg-gradient-to-b from-white to-[#F5F8FB]">
       {/* 상단 고정 영역: 검색 및 카테고리 칩 */}
@@ -162,7 +169,7 @@ const MainPage = () => {
 
           {/* 카테고리 칩 가로 스크롤 */}
           <div className="overflow-x-auto -mx-1">
-            <div className="flex gap-2 px-1 pb-2 whitespace-nowrap">
+            <div className="flex gap-2 px-1 pb-3 whitespace-nowrap">
               {[
                 { id: "all", name: "전체" },
                 ...categories.map((c) => ({ id: String(c.id), name: c.name })),
@@ -241,6 +248,7 @@ const MainPage = () => {
             <Card
               key={diary.id}
               className="bg-white/95 border border-border/60 hover:border-primary/30 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer rounded-2xl group overflow-hidden relative"
+              onClick={() => goToDetail(diary.id)}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -266,9 +274,10 @@ const MainPage = () => {
 
                 <div className="flex justify-between items-center">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     className="group/btn text-primary hover:bg-primary/10 font-semibold px-3 py-2 rounded-full"
+                    onClick={(e) => { e.stopPropagation(); goToDetail(diary.id) }}
                   >
                     <span className="group-hover/btn:translate-x-0.5 transition-transform duration-200">
                       자세히 보기

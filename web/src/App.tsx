@@ -6,6 +6,7 @@ import GlobalLayout from "./components/layouts/global-layout";
 import SignInPage from "./pages/signin";
 import SignUpPage from "./pages/signup";
 import MainPage from "./pages/main";
+import DiaryDetailPage from "./pages/diary-detail";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         </Route>
         <Route path="/" element={<GlobalLayout />}>
           <Route index element={<MainPage />} />
+          <Route path="diary/:id" element={<DiaryDetailPage />} />
         </Route>
 
       </Routes>
