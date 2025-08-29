@@ -121,7 +121,7 @@ const MainPage = () => {
         </div>
 
         <Select value={searchCategory || "all"} onValueChange={handleChangeSearchCategory}>
-          <SelectTrigger className="bg-white border-gray-200 focus:border-gray-400">
+          <SelectTrigger className="bg-white border-gray-200 focus:border-gray-400 w-full">
             <SelectValue placeholder="카테고리 선택" />
           </SelectTrigger>
           <SelectContent>
