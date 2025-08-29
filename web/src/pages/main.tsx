@@ -117,7 +117,7 @@ const MainPage = () => {
         </div>
 
         <Select value={searchCategory || "all"} onValueChange={handleChangeSearchCategory}>
-          <SelectTrigger className="h-12 bg-input border-border focus:border-primary/50 focus:ring-ring shadow-sm rounded-xl w-full">
+          <SelectTrigger className="h-12 bg-input border-border focus:border-primary/50 focus:ring-ring shadow-sm rounded-xl">
             <SelectValue placeholder="카테고리 선택" />
           </SelectTrigger>
           <SelectContent>
@@ -149,12 +149,7 @@ const MainPage = () => {
         </div>
       </form>
 
-      <Button
-        className="w-full h-14 bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-md hover:shadow-lg transition-all duration-200 rounded-xl font-semibold text-lg"
-        size="lg"
-      >
-        새 일기 작성
-      </Button>
+      <Button className="w-full h-14 bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-md hover:shadow-lg transition-all duration-200 rounded-xl font-semibold text-lg" size="lg" >새 일기 작성</Button>
 
       <div className="space-y-4">
         {diaries && diaries.length === 0 && !isLoading ? (
@@ -180,33 +175,48 @@ const MainPage = () => {
           diaries.map((diary) => (
             <Card
               key={diary.id}
-              className="bg-card border-border hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer rounded-xl group"
+              className="bg-gradient-to-br from-card via-card to-card/95 border border-border/50 hover:border-primary/30 shadow-md hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 cursor-pointer rounded-2xl group overflow-hidden relative backdrop-blur-sm"
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-xl text-card-foreground text-balance group-hover:text-primary transition-colors duration-200">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-secondary/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              <CardHeader className="pb-4 relative z-10">
+                <div className="flex items-start justify-between gap-3">
+                  <CardTitle className="text-xl font-bold text-card-foreground text-balance group-hover:text-primary transition-colors duration-300 leading-tight">
                     {diary.title}
                   </CardTitle>
-                  <Badge className="ml-2 shrink-0 bg-secondary/10 text-secondary border-secondary/20 rounded-lg px-3 py-1">
+                  <Badge className="shrink-0 bg-gradient-to-r from-secondary/20 to-secondary/10 text-secondary border border-secondary/30 rounded-full px-4 py-1.5 text-xs font-semibold shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200 text-black">
                     {getCategoryName(diary.category_id)}
                   </Badge>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {formatDate(diary.created_at)}
+                <div className="flex items-center text-sm text-muted-foreground/80 mt-2">
+                  <div className="flex items-center bg-muted/30 rounded-full px-3 py-1.5">
+                    <Calendar className="mr-2 h-4 w-4 text-primary/70" />
+                    <span className="font-medium">{formatDate(diary.created_at)}</span>
+                  </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <CardDescription className="text-card-foreground/80 text-pretty leading-relaxed mb-4">
+
+              <CardContent className="pt-0 relative z-10">
+                <CardDescription className="text-card-foreground/85 text-pretty leading-relaxed mb-6 text-base">
                   {truncateContent(diary.content)}
                 </CardDescription>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-0 h-auto text-primary hover:text-primary/80 font-medium group-hover:translate-x-1 transition-all duration-200"
-                >
-                  자세히 보기
-                </Button>
+
+                <div className="flex justify-between items-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="group/btn bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 text-primary hover:text-primary border border-primary/20 hover:border-primary/30 font-semibold px-4 py-2 rounded-full transition-all duration-200 hover:shadow-md hover:shadow-primary/20"
+                  >
+                    <span className="group-hover/btn:translate-x-0.5 transition-transform duration-200">
+                      자세히 보기
+                    </span>
+                  </Button>
+
+                  <div className="flex items-center text-xs text-muted-foreground/60">
+                    <div className="w-2 h-2 rounded-full bg-primary/30 mr-2" />
+                    <span>{diary.content.length}자</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           ))
