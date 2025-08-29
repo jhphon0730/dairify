@@ -106,7 +106,7 @@ const MainPage = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-3 min-h-screen bg-background">
+    <div className="max-w-lg mx-auto p-4 space-y-3 min-h-screen bg-background">
       {/* Search Form */}
       <form onSubmit={handleSearchSubmit} className="space-y-4">
         <div className="relative">

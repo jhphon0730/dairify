@@ -31,7 +31,7 @@ const GlobalLayout = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="text-center space-y-2 mx-0 my-2">
+      <header className="text-center space-y-2 mx-0 mt-6 mb-2">
         <h1 className="text-3xl font-bold text-gray-600">Dairify</h1>
         <p className="text-muted-foreground">나만의 소중한 일기장</p>
       </header>
